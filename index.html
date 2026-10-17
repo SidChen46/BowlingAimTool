@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>保齡球幾何瞄準計算器</title>
 
-  <!-- iOS 桌面 App 專屬 PWA 設定 -->
+  <!-- iOS 桌面 App 專屬設定 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="球道瞄準">
   <meta name="theme-color" content="#0f172a">
 
-  <!-- 桌面 App 圖示 (SVG 向量內嵌，加到桌面時會顯示專屬保齡球圖示) -->
+  <!-- 桌面 App 圖示 -->
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230f172a'/%3E%3Ccircle cx='50' cy='50' r='32' fill='%23ef4444'/%3E%3Ccircle cx='42' cy='40' r='4' fill='%23ffffff'/%3E%3Ccircle cx='58' cy='40' r='4' fill='%23ffffff'/%3E%3Ccircle cx='50' cy='56' r='4' fill='%23ffffff'/%3E%3C/svg%3E">
 
   <style>
@@ -22,9 +22,6 @@
       --text-muted: #94a3b8;
       --primary: #38bdf8;
       --accent: #f59e0b;
-      --board-wood: #2a2015;
-      --board-alt: #36291a;
-      --lane-line: #523e26;
     }
 
     * {
@@ -33,90 +30,63 @@
       padding: 0;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
+      -webkit-user-select: none;
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
       background-color: var(--bg);
       color: var(--text-main);
-      padding: env(safe-area-inset-top, 20px) 16px env(safe-area-inset-bottom, 20px);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
     }
 
-    .container {
+    /* 針對 iOS 安全區域與單頁滿版配置 */
+    .app-wrapper {
       width: 100%;
-      max-width: 440px;
+      max-width: 430px;
+      height: 100%;
+      margin: 0 auto;
+      padding: calc(env(safe-area-inset-top, 16px) + 6px) 14px calc(env(safe-area-inset-bottom, 12px) + 6px);
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      justify-content: space-between;
+      gap: 8px;
     }
 
-    header {
-      text-align: center;
-      margin-top: 8px;
+    /* 頂部標題與手性切換整合，節省垂直空間 */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
     }
 
-    header h1 {
-      font-size: 1.35rem;
+    .top-bar h1 {
+      font-size: 1.1rem;
       font-weight: 700;
       letter-spacing: 0.5px;
     }
 
-    /* 主結果卡片 */
-    .result-card {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-      border: 1px solid #334155;
-      border-radius: 20px;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
-    }
-
-    .result-label {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    .target-board {
-      font-size: 3.2rem;
-      font-weight: 800;
-      color: var(--primary);
-      line-height: 1.1;
-      margin: 6px 0;
-      text-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
-    }
-
-    .target-desc {
-      font-size: 1rem;
-      color: #e2e8f0;
-      font-weight: 500;
-    }
-
-    /* 手性切換開關 */
     .hand-toggle {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      background: #1e293b;
-      border-radius: 12px;
-      padding: 4px;
-      gap: 4px;
+      display: flex;
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 3px;
+      border: 1px solid #334155;
     }
 
     .toggle-btn {
-      padding: 8px;
+      padding: 4px 10px;
       border: none;
       background: transparent;
       color: var(--text-muted);
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       font-weight: 600;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: all 0.2s ease;
     }
 
     .toggle-btn.active {
@@ -124,33 +94,90 @@
       color: #0f172a;
     }
 
-    /* 參數控制群組 */
+    /* 結果顯示區 */
+    .result-card {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 10px 14px;
+      text-align: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .laydown-badge {
+      color: #10b981;
+      font-weight: 600;
+    }
+
+    .target-board {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.05;
+      margin: 2px 0;
+      text-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
+    }
+
+    .target-desc {
+      font-size: 0.9rem;
+      color: #e2e8f0;
+      font-weight: 600;
+    }
+
+    /* 滑桿控制區 */
     .controls {
       background: var(--card-bg);
-      border-radius: 16px;
-      padding: 16px;
+      border-radius: 14px;
+      padding: 10px 14px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      justify-content: space-around;
+      gap: 8px;
       border: 1px solid #334155;
+      flex-shrink: 0;
     }
 
     .control-item {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 3px;
     }
 
     .control-header {
       display: flex;
       justify-content: space-between;
-      font-size: 0.9rem;
+      align-items: center;
+      font-size: 0.82rem;
       font-weight: 500;
     }
 
-    .control-header span:last-child {
+    .val-badge {
       color: var(--primary);
       font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dir-hint {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      width: 28px;
+      text-align: center;
+      flex-shrink: 0;
     }
 
     input[type=range] {
@@ -163,6 +190,11 @@
       outline: none;
     }
 
+    /* 右手模式下：球道左邊是 39 板、右邊是 1 板，將滑桿反轉以符合視覺直覺 */
+    input[type=range].rtl-slider {
+      direction: rtl;
+    }
+
     input[type=range]::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
@@ -172,94 +204,131 @@
       background: #f8fafc;
       border: 3px solid var(--primary);
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
     }
 
-    /* 球道軌跡畫布 */
+    /* 球道畫布區：自動填滿剩餘彈性高度 */
     .canvas-card {
       background: var(--card-bg);
-      border-radius: 16px;
-      padding: 14px;
+      border-radius: 14px;
+      padding: 8px 12px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 8px;
       border: 1px solid #334155;
+      flex: 1;
+      min-height: 120px;
+      overflow: hidden;
     }
 
-    .canvas-title {
-      font-size: 0.8rem;
+    .canvas-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
       color: var(--text-muted);
-      align-self: flex-start;
+      margin-bottom: 4px;
+      flex-shrink: 0;
+    }
+
+    .canvas-container {
+      flex: 1;
+      width: 100%;
+      position: relative;
     }
 
     canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
-      height: 180px;
+      height: 100%;
       border-radius: 8px;
-      background: #16120c;
+      background: #18130d;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <header>
-      <h1>保齡球瞄準幾何計算器</h1>
-    </header>
+  <div class="app-wrapper">
+    <!-- 頂部列 -->
+    <div class="top-bar">
+      <h1>保齡球瞄準計算器</h1>
+      <div class="hand-toggle">
+        <button class="toggle-btn active" id="btnRight" onclick="setHand('R')">右手 (右1板)</button>
+        <button class="toggle-btn" id="btnLeft" onclick="setHand('L')">左手 (左1板)</button>
+      </div>
+    </div>
 
     <!-- 結果面板 -->
     <div class="result-card">
-      <div class="result-label">目標箭頭（15 呎處）</div>
+      <div class="result-header">
+        <span>目標箭頭 (15呎)</span>
+        <span class="laydown-badge" id="laydownInfo">實際落球：20.0 板</span>
+      </div>
       <div class="target-board" id="targetBoard">15.5</div>
-      <div class="target-desc" id="targetDesc">瞄準第 3 箭頭微偏右</div>
+      <div class="target-desc" id="targetDesc">第 3 箭頭 (15板) 往左偏 0.5 板</div>
     </div>
 
-    <!-- 左/右手選擇 -->
-    <div class="hand-toggle">
-      <button class="toggle-btn active" id="btnRight" onclick="setHand('R')">右手球員 (Right)</button>
-      <button class="toggle-btn" id="btnLeft" onclick="setHand('L')">左手球員 (Left)</button>
-    </div>
-
-    <!-- 滑桿群組 -->
+    <!-- 控制滑桿 -->
     <div class="controls">
       <div class="control-item">
         <div class="control-header">
-          <span>滑步站點板位 (Stance Board)</span>
-          <span id="stanceVal">25 板</span>
+          <span>滑步站點 (Stance)</span>
+          <span class="val-badge" id="stanceVal">25.0 板</span>
         </div>
-        <input type="range" id="stance" min="1" max="39" step="1" value="25" oninput="calculate()">
+        <div class="slider-wrap">
+          <span class="dir-hint" id="stanceLeftHint">左39</span>
+          <input type="range" id="stance" class="rtl-slider" min="1" max="39" step="0.5" value="25" oninput="calculate()">
+          <span class="dir-hint" id="stanceRightHint">右1</span>
+        </div>
       </div>
 
       <div class="control-item">
         <div class="control-header">
-          <span>落球偏移量 (Laydown Offset)</span>
-          <span id="offsetVal">5 板</span>
+          <span>落球內縮偏移 (Offset)</span>
+          <span class="val-badge" id="offsetVal">5.0 板</span>
         </div>
-        <input type="range" id="offset" min="0" max="10" step="0.5" value="5" oninput="calculate()">
+        <div class="slider-wrap">
+          <span class="dir-hint">0</span>
+          <input type="range" id="offset" min="0" max="12" step="0.5" value="5" oninput="calculate()">
+          <span class="dir-hint">12</span>
+        </div>
       </div>
 
       <div class="control-item">
         <div class="control-header">
-          <span>目標轉折點板位 (Break Point Board)</span>
-          <span id="bpBoardVal">8 板</span>
+          <span>轉折點板位 (Break Point)</span>
+          <span class="val-badge" id="bpBoardVal">8.0 板</span>
         </div>
-        <input type="range" id="bpBoard" min="1" max="39" step="0.5" value="8" oninput="calculate()">
+        <div class="slider-wrap">
+          <span class="dir-hint" id="bpLeftHint">左39</span>
+          <input type="range" id="bpBoard" class="rtl-slider" min="1" max="39" step="0.5" value="8" oninput="calculate()">
+          <span class="dir-hint" id="bpRightHint">右1</span>
+        </div>
       </div>
 
       <div class="control-item">
         <div class="control-header">
-          <span>轉折點距離 (Break Point Dist)</span>
-          <span id="bpDistVal">40 呎</span>
+          <span>轉折點距離 (BP Distance)</span>
+          <span class="val-badge" id="bpDistVal">40 呎</span>
         </div>
-        <input type="range" id="bpDist" min="36" max="45" step="1" value="40" oninput="calculate()">
+        <div class="slider-wrap">
+          <span class="dir-hint">35呎</span>
+          <input type="range" id="bpDist" min="35" max="46" step="1" value="40" oninput="calculate()">
+          <span class="dir-hint">46呎</span>
+        </div>
       </div>
     </div>
 
-    <!-- 即時球道俯視簡圖 -->
+    <!-- 球道視覺圖 -->
     <div class="canvas-card">
-      <div class="canvas-title">球道軌跡投影 (0呎 犯規線 → 15呎 箭頭 → 轉折點)</div>
-      <canvas id="laneCanvas" width="400" height="200"></canvas>
+      <div class="canvas-header">
+        <span id="laneLeftLabel">◀ 左側溝 (39板)</span>
+        <span>球道俯視軌跡</span>
+        <span id="laneRightLabel">右側溝 (1板) ▶</span>
+      </div>
+      <div class="canvas-container" id="canvasBox">
+        <canvas id="laneCanvas"></canvas>
+      </div>
     </div>
   </div>
 
@@ -270,7 +339,45 @@
       currentHand = hand;
       document.getElementById('btnRight').classList.toggle('active', hand === 'R');
       document.getElementById('btnLeft').classList.toggle('active', hand === 'L');
+
+      const stanceSlider = document.getElementById('stance');
+      const bpSlider = document.getElementById('bpBoard');
+
+      if (hand === 'R') {
+        // 右手：右邊是 1 板，左邊是 39 板
+        stanceSlider.classList.add('rtl-slider');
+        bpSlider.classList.add('rtl-slider');
+        document.getElementById('stanceLeftHint').innerText = '左39';
+        document.getElementById('stanceRightHint').innerText = '右1';
+        document.getElementById('bpLeftHint').innerText = '左39';
+        document.getElementById('bpRightHint').innerText = '右1';
+        document.getElementById('laneLeftLabel').innerText = '◀ 左溝 (39板)';
+        document.getElementById('laneRightLabel').innerText = '右溝 (1板) ▶';
+      } else {
+        // 左手：左邊是 1 板，右邊是 39 板
+        stanceSlider.classList.remove('rtl-slider');
+        bpSlider.classList.remove('rtl-slider');
+        document.getElementById('stanceLeftHint').innerText = '左1';
+        document.getElementById('stanceRightHint').innerText = '右39';
+        document.getElementById('bpLeftHint').innerText = '左1';
+        document.getElementById('bpRightHint').innerText = '右39';
+        document.getElementById('laneLeftLabel').innerText = '◀ 左溝 (1板)';
+        document.getElementById('laneRightLabel').innerText = '右溝 (39板) ▶';
+      }
       calculate();
+    }
+
+    // 將板位轉換為 Canvas 上的 X 座標
+    function boardToX(board, width) {
+      const padding = 16;
+      const usableW = width - padding * 2;
+      if (currentHand === 'R') {
+        // 右手：第 1 板在最右邊，第 39 板在最左邊
+        return padding + ((39 - board) / 38) * usableW;
+      } else {
+        // 左手：第 1 板在最左邊，第 39 板在最右邊
+        return padding + ((board - 1) / 38) * usableW;
+      }
     }
 
     function calculate() {
@@ -279,114 +386,65 @@
       const bpBoard = parseFloat(document.getElementById('bpBoard').value);
       const bpDist = parseFloat(document.getElementById('bpDist').value);
 
-      document.getElementById('stanceVal').innerText = stance + ' 板';
-      document.getElementById('offsetVal').innerText = offset + ' 板';
-      document.getElementById('bpBoardVal').innerText = bpBoard + ' 板';
+      document.getElementById('stanceVal').innerText = stance.toFixed(1) + ' 板';
+      document.getElementById('offsetVal').innerText = offset.toFixed(1) + ' 板';
+      document.getElementById('bpBoardVal').innerText = bpBoard.toFixed(1) + ' 板';
       document.getElementById('bpDistVal').innerText = bpDist + ' 呎';
 
-      // 右手落球向右偏 (板數變小)，左手向左偏 (板數變大)
-      let laydown = (currentHand === 'R') ? (stance - offset) : (stance + offset);
-      laydown = Math.max(1, Math.min(39, laydown));
+      // 不論左右手，球員站在球道內側，手腕落球點都會往外側溝方向偏移（板數減少）
+      const laydown = Math.max(1, Math.min(39, stance - offset));
+      document.getElementById('laydownInfo').innerText = `落球點：${laydown.toFixed(1)} 板`;
 
-      // 相似三角形比例: 箭頭位置固定在 15 呎
-      const arrowDistance = 15;
-      const targetArrowBoard = laydown + (arrowDistance / bpDist) * (bpBoard - laydown);
+      // 三角相似內插計算 15 呎箭頭板位
+      const arrowDist = 15;
+      const targetArrowBoard = laydown + (arrowDist / bpDist) * (bpBoard - laydown);
 
-      // 更新數值卡片
       document.getElementById('targetBoard').innerText = targetArrowBoard.toFixed(1);
 
-      // 換算為箭頭口語描述 (每 5 塊板為一個箭頭：5, 10, 15, 20, 25, 30, 35)
-      const closestArrowNum = Math.round(targetArrowBoard / 5);
+      // 計算最接近的箭頭 (5, 10, 15, 20, 25, 30, 35)
+      let closestArrowNum = Math.round(targetArrowBoard / 5);
+      closestArrowNum = Math.max(1, Math.min(7, closestArrowNum));
       const arrowBoardRef = closestArrowNum * 5;
       const diff = targetArrowBoard - arrowBoardRef;
-      let desc = `約第 ${closestArrowNum} 箭頭 (${arrowBoardRef} 板)`;
-      if (Math.abs(diff) >= 0.3) {
-        desc += diff > 0 ? ` 往左偏 ${Math.abs(diff).toFixed(1)} 板` : ` 往右偏 ${Math.abs(diff).toFixed(1)} 板`;
+
+      let desc = `第 ${closestArrowNum} 箭頭 (${arrowBoardRef}板)`;
+      if (Math.abs(diff) >= 0.2) {
+        if (currentHand === 'R') {
+          // 右手：板數大 = 偏左，板數小 = 偏右
+          desc += diff > 0 ? ` 往左 ${Math.abs(diff).toFixed(1)} 板` : ` 往右 ${Math.abs(diff).toFixed(1)} 板`;
+        } else {
+          // 左手：板數大 = 偏右，板數小 = 偏左
+          desc += diff > 0 ? ` 往右 ${Math.abs(diff).toFixed(1)} 板` : ` 往左 ${Math.abs(diff).toFixed(1)} 板`;
+        }
       } else {
         desc += ' 正中央';
       }
       document.getElementById('targetDesc').innerText = desc;
 
-      drawLane(laydown, targetArrowBoard, bpBoard, bpDist);
+      drawLane(stance, laydown, targetArrowBoard, bpBoard, bpDist);
     }
 
-    function drawLane(laydown, arrow, bpBoard, bpDist) {
+    function drawLane(stance, laydown, arrow, bpBoard, bpDist) {
+      const box = document.getElementById('canvasBox');
       const canvas = document.getElementById('laneCanvas');
-      const ctx = canvas.getContext('2d');
-      const w = canvas.width;
-      const h = canvas.height;
+      const dpr = window.devicePixelRatio || 1;
+      const rect = box.getBoundingClientRect();
 
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = rect.height;
       ctx.clearRect(0, 0, w, h);
 
-      // 繪製球道底色與每 5 板輔助線
-      for (let i = 1; i <= 39; i++) {
-        const x = (i / 40) * w;
-        if (i % 5 === 0) {
-          ctx.strokeStyle = '#3b2f1e';
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, h);
-          ctx.stroke();
-        }
-      }
+      const yFoul = h - 18;
+      const yTop = 14;
+      const usableH = yFoul - yTop;
 
-      // 繪製橫向關鍵標記線 (犯規線底端、箭頭 15 呎、轉折點)
-      const yFoul = h - 20;
-      const yArrow = h - 20 - (15 / 45) * (h - 40);
-      const yBp = h - 20 - (bpDist / 45) * (h - 40);
-
-      // 箭頭標記線
-      ctx.strokeStyle = '#475569';
-      ctx.setLineDash([3, 3]);
-      ctx.beginPath();
-      ctx.moveTo(0, yArrow);
-      ctx.lineTo(w, yArrow);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // 箭頭三角標記 (5, 10, 15, 20, 25, 30, 35)
-      for (let b = 5; b <= 35; b += 5) {
-        const ax = (b / 40) * w;
-        ctx.fillStyle = (Math.abs(b - arrow) < 2.5) ? '#38bdf8' : '#64748b';
-        ctx.beginPath();
-        ctx.moveTo(ax, yArrow - 5);
-        ctx.lineTo(ax - 3, yArrow + 3);
-        ctx.lineTo(ax + 3, yArrow + 3);
-        ctx.fill();
-      }
-
-      // 繪製軌跡射線
-      const xLaydown = (laydown / 40) * w;
-      const xArrow = (arrow / 40) * w;
-      const xBp = (bpBoard / 40) * w;
-
-      ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(xLaydown, yFoul);
-      ctx.lineTo(xArrow, yArrow);
-      ctx.lineTo(xBp, yBp);
-      ctx.stroke();
-
-      // 繪製三個節點圓點
-      function drawDot(x, y, color, label) {
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.arc(x, y, 5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#f8fafc';
-        ctx.font = '10px sans-serif';
-        ctx.fillText(label, x + 7, y + 3);
-      }
-
-      drawDot(xLaydown, yFoul, '#10b981', '落球');
-      drawDot(xArrow, yArrow, '#38bdf8', '箭頭');
-      drawDot(xBp, yBp, '#ef4444', '轉折');
-    }
-
-    // 初始化
-    calculate();
-  </script>
-</body>
-</html>
+      // 依距離換算 Y 座標 (以 48 呎為頂部基準)
+      const distToY = (d) => yFoul - (d / 48) * usableH;
+      const yArrow = distToY(15);
+      const yBp = distToY(bpDist
