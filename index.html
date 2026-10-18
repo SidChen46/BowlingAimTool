@@ -11,21 +11,25 @@
   <meta name="apple-mobile-web-app-title" content="保齡球助手">
   <meta name="theme-color" content="#090d16">
 
-  <!-- 專屬黑金紅雙色保齡球圖示 -->
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23090d16'/%3E%3Ccircle cx='50' cy='50' r='36' fill='%23ef4444' stroke='%23fbbf24' stroke-width='3'/%3E%3Ccircle cx='42' cy='38' r='4' fill='%23ffffff'/%3E%3Ccircle cx='58' cy='38' r='4' fill='%23ffffff'/%3E%3Ccircle cx='50' cy='54' r='4' fill='%23ffffff'/%3E%3C/svg%3E">
 
   <style>
     :root {
       --bg-deep: #090d16;
-      --bg-card: rgba(20, 28, 46, 0.86);
+      --bg-card: rgba(20, 28, 46, 0.88);
       --border-glass: rgba(255, 255, 255, 0.09);
       --primary: #38bdf8;
       --gold: #fbbf24;
       --purple: #c084fc;
       --emerald: #10b981;
+      --rose: #fb7185;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --text-dim: #64748b;
+      /* 根據螢幕高度自動縮放的基準間距 */
+      --gap-s: clamp(4px, 0.8dvh, 8px);
+      --gap-m: clamp(6px, 1.1dvh, 11px);
+      --pad-card: clamp(8px, 1.3dvh, 13px);
     }
 
     * {
@@ -44,21 +48,20 @@
       overflow: hidden;
       background-color: var(--bg-deep);
       background-image: 
-        radial-gradient(circle at 15% 10%, rgba(56, 189, 248, 0.1) 0%, transparent 40%),
-        radial-gradient(circle at 85% 20%, rgba(251, 191, 36, 0.1) 0%, transparent 45%),
-        radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.08) 0%, transparent 45%);
+        radial-gradient(circle at 15% 10%, rgba(56, 189, 248, 0.09) 0%, transparent 40%),
+        radial-gradient(circle at 85% 20%, rgba(251, 191, 36, 0.09) 0%, transparent 45%);
       color: var(--text-main);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
     }
 
     .app-shell {
       width: 100%;
-      max-width: 440px;
+      max-width: 460px;
       height: 100%;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      padding-top: calc(env(safe-area-inset-top, 10px) + 4px);
+      padding-top: calc(env(safe-area-inset-top, 8px) + 2px);
     }
 
     .tab-view {
@@ -66,7 +69,7 @@
       flex: 1;
       width: 100%;
       overflow-y: auto;
-      padding: 4px 12px 16px;
+      padding: 2px 10px 12px;
       scrollbar-width: none;
     }
     .tab-view::-webkit-scrollbar { display: none; }
@@ -74,23 +77,22 @@
     .tab-view.active {
       display: flex;
       flex-direction: column;
+      gap: var(--gap-m);
     }
 
+    /* 瞄準器分頁鎖定一頁滿版自動伸縮 */
     #tabAim.active {
       overflow: hidden;
-      gap: 6px;
+      gap: var(--gap-s);
+      padding-bottom: 6px;
     }
 
-    #tabBiao.active, #tabTotal.active {
-      gap: 10px;
-    }
-
-    /* 底部三分頁導航列 */
+    /* 底部導航列自適應高度 */
     .bottom-nav {
       flex-shrink: 0;
-      height: calc(56px + env(safe-area-inset-bottom, 8px));
-      padding-bottom: env(safe-area-inset-bottom, 8px);
-      background: rgba(11, 16, 28, 0.95);
+      height: calc(clamp(48px, 6.5dvh, 56px) + env(safe-area-inset-bottom, 6px));
+      padding-bottom: env(safe-area-inset-bottom, 6px);
+      background: rgba(11, 16, 28, 0.96);
       backdrop-filter: blur(16px);
       border-top: 1px solid var(--border-glass);
       display: grid;
@@ -106,16 +108,15 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 3px;
-      font-size: 0.7rem;
+      gap: 2px;
+      font-size: clamp(0.65rem, 1.8vw, 0.72rem);
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
     }
 
     .nav-item svg {
-      width: 20px;
-      height: 20px;
+      width: clamp(18px, 2.4dvh, 21px);
+      height: clamp(18px, 2.4dvh, 21px);
       fill: currentColor;
     }
 
@@ -123,7 +124,7 @@
     .nav-item.active-biao { color: var(--gold); }
     .nav-item.active-total { color: var(--emerald); }
 
-    /* ================= 共用元件樣式 ================= */
+    /* ================= 共用頂部與按鈕 ================= */
     .top-bar {
       display: flex;
       justify-content: space-between;
@@ -132,9 +133,9 @@
     }
 
     .top-bar h1 {
-      font-size: 1.05rem;
+      font-size: clamp(0.95rem, 4vw, 1.08rem);
       font-weight: 800;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
     }
 
     .pill-group {
@@ -146,11 +147,11 @@
     }
 
     .pill-btn {
-      padding: 4px 8px;
+      padding: 3px 7px;
       border: none;
       background: transparent;
       color: var(--text-muted);
-      font-size: 0.72rem;
+      font-size: clamp(0.66rem, 2.6vw, 0.72rem);
       font-weight: 600;
       border-radius: 6px;
       cursor: pointer;
@@ -160,12 +161,12 @@
     .pill-btn.active-gold { background: rgba(251, 191, 36, 0.2); color: var(--gold); border: 1px solid rgba(251, 191, 36, 0.4); }
     .pill-btn.active-emerald { background: rgba(16, 185, 129, 0.2); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.4); }
 
-    /* 瞄準結果卡 */
+    /* ================= 分頁 1：瞄準器自適應 ================= */
     .aim-result-card {
       background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       border: 1px solid var(--border-glass);
       border-radius: 12px;
-      padding: 8px 12px;
+      padding: clamp(6px, 1dvh, 10px) 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -173,7 +174,7 @@
     }
 
     .aim-target-num {
-      font-size: 2.25rem;
+      font-size: clamp(1.85rem, 4.2dvh, 2.3rem);
       font-weight: 800;
       color: var(--primary);
       line-height: 1;
@@ -183,10 +184,10 @@
     .aim-controls {
       background: var(--bg-card);
       border-radius: 12px;
-      padding: 8px 10px;
+      padding: clamp(6px, 1dvh, 10px) 10px;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 7px 12px;
+      gap: clamp(4px, 0.8dvh, 8px) 10px;
       border: 1px solid var(--border-glass);
       flex-shrink: 0;
     }
@@ -194,14 +195,14 @@
     .ctrl-box {
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      gap: 2px;
     }
 
     .ctrl-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.72rem;
+      font-size: clamp(0.68rem, 2.7vw, 0.74rem);
       font-weight: 500;
     }
 
@@ -210,11 +211,11 @@
     .slider-row {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
     }
 
     .hint-txt {
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       color: var(--text-muted);
       flex-shrink: 0;
     }
@@ -232,8 +233,8 @@
     input[type=range]::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 19px;
-      height: 19px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
       background: #f8fafc;
       border: 2.5px solid var(--primary);
@@ -246,12 +247,12 @@
     .lane-card {
       background: var(--bg-card);
       border-radius: 12px;
-      padding: 6px 10px 8px;
+      padding: 5px 8px 6px;
       display: flex;
       flex-direction: column;
       border: 1px solid var(--border-glass);
       flex: 1;
-      min-height: 180px;
+      min-height: 140px;
       overflow: hidden;
     }
 
@@ -259,9 +260,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       color: var(--text-muted);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
       flex-shrink: 0;
     }
 
@@ -283,36 +284,36 @@
       transition: width 0.22s ease;
     }
 
-    /* ================= 標會與總分卡片樣式 ================= */
+    /* ================= 分頁 2 & 3：自適應緊湊卡片 ================= */
     .hero-card {
-      background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+      background: linear-gradient(145deg, rgba(30, 41, 59, 0.92) 0%, rgba(15, 23, 42, 0.96) 100%);
       border: 1px solid rgba(251, 191, 36, 0.35);
-      border-radius: 16px;
-      padding: 12px 14px;
-      box-shadow: 0 8px 25px -8px rgba(251, 191, 36, 0.18);
+      border-radius: 14px;
+      padding: var(--pad-card);
+      box-shadow: 0 6px 20px -8px rgba(251, 191, 36, 0.18);
       flex-shrink: 0;
     }
 
     .hero-card.emerald-theme {
-      border-color: rgba(16, 185, 129, 0.35);
-      box-shadow: 0 8px 25px -8px rgba(16, 185, 129, 0.18);
+      border-color: rgba(16, 185, 129, 0.38);
+      box-shadow: 0 6px 20px -8px rgba(16, 185, 129, 0.18);
     }
 
     .jia-main {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin: 4px 0 8px;
+      margin: 2px 0 6px;
     }
 
     .step-btn {
-      width: 38px;
-      height: 36px;
-      border-radius: 9px;
+      width: clamp(32px, 8.5vw, 38px);
+      height: clamp(28px, 3.8dvh, 34px);
+      border-radius: 8px;
       border: 1px solid var(--border-glass);
       background: rgba(255, 255, 255, 0.06);
       color: var(--text-main);
-      font-size: 0.85rem;
+      font-size: clamp(0.75rem, 2.8vw, 0.85rem);
       font-weight: 700;
       cursor: pointer;
       flex-shrink: 0;
@@ -320,14 +321,14 @@
     .step-btn:active { background: rgba(251, 191, 36, 0.25); }
 
     .big-input {
-      width: 135px;
+      width: 110px;
       background: transparent;
       border: none;
       text-align: center;
-      font-size: 2.5rem;
+      font-size: clamp(1.9rem, 4.2dvh, 2.35rem);
       font-weight: 900;
       color: var(--gold);
-      text-shadow: 0 0 20px rgba(251, 191, 36, 0.35);
+      text-shadow: 0 0 18px rgba(251, 191, 36, 0.35);
       outline: none;
       user-select: text;
       -webkit-user-select: text;
@@ -335,48 +336,48 @@
 
     .big-input.emerald-txt {
       color: var(--emerald);
-      text-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+      text-shadow: 0 0 18px rgba(16, 185, 129, 0.35);
     }
 
-    .chips-row {
+    /* 自動換行網格按鈕，不再被右邊螢幕切斷 */
+    .chips-wrap {
       display: flex;
-      gap: 5px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      padding-bottom: 1px;
+      flex-wrap: wrap;
+      gap: 4px;
     }
-    .chips-row::-webkit-scrollbar { display: none; }
 
     .chip {
-      flex-shrink: 0;
-      padding: 4px 9px;
-      border-radius: 7px;
+      flex: 1 1 auto;
+      min-width: 42px;
+      text-align: center;
+      padding: 3px 6px;
+      border-radius: 6px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border-glass);
       color: var(--text-muted);
-      font-size: 0.72rem;
+      font-size: clamp(0.66rem, 2.5vw, 0.72rem);
       font-weight: 600;
       cursor: pointer;
     }
     .chip.active {
-      background: rgba(251, 191, 36, 0.2);
+      background: rgba(251, 191, 36, 0.22);
       color: var(--gold);
-      border-color: rgba(251, 191, 36, 0.45);
+      border-color: rgba(251, 191, 36, 0.5);
     }
     .chip.active-em {
-      background: rgba(16, 185, 129, 0.2);
+      background: rgba(16, 185, 129, 0.22);
       color: var(--emerald);
-      border-color: rgba(16, 185, 129, 0.45);
+      border-color: rgba(16, 185, 129, 0.5);
     }
 
     .generator-card {
       background: var(--bg-card);
       border: 1px solid var(--border-glass);
-      border-radius: 16px;
-      padding: 12px 14px;
+      border-radius: 14px;
+      padding: var(--pad-card);
       display: flex;
       flex-direction: column;
-      gap: 9px;
+      gap: var(--gap-s);
       flex-shrink: 0;
     }
 
@@ -388,7 +389,7 @@
     }
 
     .gen-label {
-      font-size: 0.74rem;
+      font-size: clamp(0.68rem, 2.6vw, 0.74rem);
       color: var(--text-muted);
       font-weight: 600;
       flex-shrink: 0;
@@ -396,25 +397,21 @@
 
     .seg-group {
       display: flex;
-      gap: 3px;
+      gap: 2px;
       background: rgba(9, 13, 22, 0.85);
-      padding: 3px;
-      border-radius: 8px;
+      padding: 2px;
+      border-radius: 7px;
       border: 1px solid var(--border-glass);
-      overflow-x: auto;
-      scrollbar-width: none;
     }
-    .seg-group::-webkit-scrollbar { display: none; }
 
     .seg-btn {
-      flex-shrink: 0;
       border: none;
       background: transparent;
       color: var(--text-muted);
-      font-size: 0.7rem;
+      font-size: clamp(0.64rem, 2.4vw, 0.7rem);
       font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 6px;
+      padding: 3px 6px;
+      border-radius: 5px;
       cursor: pointer;
     }
 
@@ -423,71 +420,72 @@
       color: #090d16;
     }
 
+    /* 改為 4 欄緊湊網格，8支籤只要2排、12支籤只要3排，大幅節省高度 */
     .yi-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 7px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
     }
 
     .lot-card {
-      background: rgba(13, 19, 33, 0.85);
+      background: rgba(13, 19, 33, 0.88);
       border: 1px solid var(--border-glass);
-      border-radius: 11px;
-      padding: 7px 5px;
+      border-radius: 9px;
+      padding: clamp(4px, 0.7dvh, 7px) 3px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: all 0.12s;
     }
 
     .lot-card.selected {
-      background: linear-gradient(145deg, rgba(56, 189, 248, 0.22), rgba(15, 23, 42, 0.95));
+      background: linear-gradient(145deg, rgba(56, 189, 248, 0.24), rgba(15, 23, 42, 0.95));
       border-color: var(--primary);
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
     }
 
-    .lot-rate { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; }
-    .lot-score { font-size: 1.38rem; font-weight: 800; color: var(--text-main); line-height: 1.15; margin: 2px 0; }
+    .lot-rate { font-size: clamp(0.6rem, 2.2vw, 0.66rem); color: var(--text-muted); font-weight: 600; }
+    .lot-score { font-size: clamp(1.1rem, 2.4dvh, 1.3rem); font-weight: 800; color: var(--text-main); line-height: 1.1; margin: 1px 0; }
     .lot-card.selected .lot-score { color: var(--primary); }
-    .lot-exact { font-size: 0.6rem; color: var(--text-dim); }
+    .lot-exact { font-size: clamp(0.55rem, 2vw, 0.62rem); color: var(--text-dim); }
+    .need-tag { font-size: clamp(0.56rem, 2vw, 0.63rem); color: var(--gold); font-weight: 700; }
 
     .inspector-box {
       background: rgba(9, 13, 22, 0.78);
       border: 1px dashed rgba(251, 191, 36, 0.35);
-      border-radius: 10px;
-      padding: 8px 10px;
+      border-radius: 9px;
+      padding: 6px 8px;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 3px;
     }
 
     .inspector-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.72rem;
+      font-size: clamp(0.66rem, 2.5vw, 0.72rem);
     }
 
     .step-badge {
-      font-size: 0.62rem;
+      font-size: 0.6rem;
       background: rgba(56, 189, 248, 0.15);
       color: var(--primary);
       border: 1px solid rgba(56, 189, 248, 0.3);
-      padding: 1px 5px;
+      padding: 1px 4px;
       border-radius: 4px;
-      margin-left: 3px;
     }
 
     .bing-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 7px;
+      gap: 5px;
     }
 
     .bing-card {
-      background: rgba(13, 19, 33, 0.85);
+      background: rgba(13, 19, 33, 0.88);
       border: 1px solid rgba(192, 132, 252, 0.22);
-      border-radius: 11px;
-      padding: 7px 5px;
+      border-radius: 9px;
+      padding: clamp(4px, 0.7dvh, 7px) 4px;
       text-align: center;
       cursor: pointer;
     }
@@ -495,40 +493,100 @@
     .bing-card.selected {
       background: linear-gradient(145deg, rgba(192, 132, 252, 0.25), rgba(15, 23, 42, 0.95));
       border-color: var(--purple);
-      box-shadow: 0 0 12px rgba(192, 132, 252, 0.25);
+      box-shadow: 0 0 10px rgba(192, 132, 252, 0.25);
     }
 
-    .bing-title { font-size: 0.68rem; color: #d8b4fe; font-weight: 600; }
-    .bing-val { font-size: 1.3rem; font-weight: 800; color: var(--text-main); margin: 2px 0; }
+    .bing-title { font-size: clamp(0.6rem, 2.2vw, 0.66rem); color: #d8b4fe; font-weight: 600; }
+    .bing-val { font-size: clamp(1.1rem, 2.3dvh, 1.25rem); font-weight: 800; color: var(--text-main); line-height: 1.15; margin: 1px 0; }
     .bing-card.selected .bing-val { color: var(--purple); }
+
+    /* ================= 總分預估與個人尾局反推專屬樣式 ================= */
+    .est-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .est-box {
+      background: rgba(9, 13, 22, 0.65);
+      border: 1px solid var(--border-glass);
+      border-radius: 10px;
+      padding: 6px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .est-box-title {
+      font-size: 0.66rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .mini-num-ctrl {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+    }
+
+    .mini-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      text-align: center;
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: var(--text-main);
+      outline: none;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .proj-banner {
+      margin-top: 6px;
+      padding: 6px 10px;
+      border-radius: 9px;
+      background: linear-gradient(90deg, rgba(16, 185, 129, 0.18), rgba(251, 191, 36, 0.15));
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .my-score-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      border-radius: 10px;
+      padding: 6px 10px;
+    }
 
     .rank-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 2px;
-      font-size: 0.78rem;
+      font-size: clamp(0.68rem, 2.5vw, 0.75rem);
       text-align: center;
-      border-radius: 10px;
+      border-radius: 8px;
       overflow: hidden;
     }
 
     .rank-table th {
       background: rgba(9, 13, 22, 0.9);
-      padding: 7px 4px;
-      font-size: 0.72rem;
-      font-weight: 700;
+      padding: 5px 2px;
+      font-size: 0.68rem;
       border-bottom: 1px solid var(--border-glass);
     }
 
     .rank-table td {
-      padding: 6px 4px;
+      padding: 4px 2px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.04);
       font-variant-numeric: tabular-nums;
       font-weight: 700;
-    }
-
-    .rank-table tr:nth-child(even) {
-      background: rgba(255, 255, 255, 0.02);
     }
 
     .rank-table tr.rank-head-row {
@@ -552,10 +610,10 @@
 
       <div class="aim-result-card">
         <div>
-          <div style="font-size: 0.72rem; color: var(--text-muted);">
+          <div style="font-size: 0.7rem; color: var(--text-muted);">
             目標箭頭 (15呎) · <span style="color: var(--emerald); font-weight: 600;" id="laydownInfo">落球 20.0 板</span>
           </div>
-          <div style="font-size: 0.84rem; font-weight: 600; margin-top: 2px;" id="targetDesc">第 3 箭頭 (15板) 往左 0.5 板</div>
+          <div style="font-size: 0.82rem; font-weight: 600; margin-top: 1px;" id="targetDesc">第 3 箭頭 (15板) 往左 0.5 板</div>
         </div>
         <div class="aim-target-num" id="targetBoard">15.5</div>
       </div>
@@ -602,9 +660,9 @@
         <div class="lane-header">
           <span id="laneLeftLabel">◀ 左39</span>
           <div class="pill-group">
-            <button class="pill-btn active" id="scaleFit" onclick="setScale('fit')" style="font-size:0.65rem;padding:2px 6px;">實戰寬版</button>
-            <button class="pill-btn" id="scaleSlim" onclick="setScale('slim')" style="font-size:0.65rem;padding:2px 6px;">擬真修長</button>
-            <button class="pill-btn" id="scaleTrue" onclick="setScale('true')" style="font-size:0.65rem;padding:2px 6px;">1:1真實</button>
+            <button class="pill-btn active" id="scaleFit" onclick="setScale('fit')" style="font-size:0.62rem;padding:2px 6px;">實戰寬版</button>
+            <button class="pill-btn" id="scaleSlim" onclick="setScale('slim')" style="font-size:0.62rem;padding:2px 6px;">擬真修長</button>
+            <button class="pill-btn" id="scaleTrue" onclick="setScale('true')" style="font-size:0.62rem;padding:2px 6px;">1:1真實</button>
           </div>
           <span id="laneRightLabel">右1 ▶</span>
         </div>
@@ -614,7 +672,7 @@
       </div>
     </div>
 
-    <!-- ==================== 分頁 2：單局標會試算儀 ==================== -->
+    <!-- ==================== 分頁 2：單局標會試算儀 (自適應緊湊版) ==================== -->
     <div id="tabBiao" class="tab-view">
       <div class="top-bar">
         <h1>🏆 單局標會試算</h1>
@@ -626,9 +684,9 @@
       </div>
 
       <div class="hero-card">
-        <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--gold); font-weight:700;">
+        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--gold); font-weight:700;">
           <span>👑 單局甲標 (最高分)</span>
-          <span style="color:var(--text-muted); font-weight:500;">點擊數字可直接修改</span>
+          <span style="color:var(--text-muted); font-weight:500;">點擊數字可修改</span>
         </div>
         <div class="jia-main">
           <button class="step-btn" onclick="stepJia(-5)">-5</button>
@@ -637,7 +695,7 @@
           <button class="step-btn" onclick="stepJia(1)">+1</button>
           <button class="step-btn" onclick="stepJia(5)">+5</button>
         </div>
-        <div class="chips-row">
+        <div class="chips-wrap" id="jiaChips">
           <button class="chip" onclick="setJia(300)">300</button>
           <button class="chip" onclick="setJia(290)">290</button>
           <button class="chip" onclick="setJia(279)">279</button>
@@ -651,24 +709,24 @@
 
       <div class="generator-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:0.8rem; font-weight:800; color:var(--primary);">🎯 單局乙標籤筒設定</span>
-          <span style="font-size:0.72rem; color:var(--text-muted);" id="poolRangeSummary">區間: 204~225</span>
+          <span style="font-size:0.76rem; font-weight:800; color:var(--primary);">🎯 單局乙標籤筒設定</span>
+          <span style="font-size:0.68rem; color:var(--text-muted);" id="poolRangeSummary">本筒: 193~225 分</span>
         </div>
 
         <div class="ctrl-box">
           <div class="ctrl-head">
             <span class="gen-label">① 籤筒最高籤 (起點)</span>
-            <span style="color:var(--gold); font-weight:800; font-size:0.86rem;" id="startRateVal">0.84 籤</span>
+            <span style="color:var(--gold); font-weight:800; font-size:0.82rem;" id="startRateVal">0.84 籤</span>
           </div>
-          <div class="slider-row" style="margin-top:2px;">
-            <button class="step-btn" style="width:28px;height:24px;font-size:0.75rem;" onclick="stepStartRate(-0.01)">-</button>
+          <div class="slider-row">
+            <button class="step-btn" style="width:26px;height:22px;font-size:0.72rem;" onclick="stepStartRate(-0.01)">-</button>
             <input type="range" id="startRateSlider" class="gold-slider" min="0.50" max="0.90" step="0.01" value="0.84" oninput="onGenChange()">
-            <button class="step-btn" style="width:28px;height:24px;font-size:0.75rem;" onclick="stepStartRate(0.01)">+</button>
+            <button class="step-btn" style="width:26px;height:22px;font-size:0.72rem;" onclick="stepStartRate(0.01)">+</button>
           </div>
         </div>
 
         <div class="gen-row">
-          <span class="gen-label">② 每支籤差</span>
+          <span class="gen-label">② 籤差</span>
           <div class="seg-group">
             <button class="seg-btn" id="step001" onclick="setLotStep(0.01)">0.01(連號)</button>
             <button class="seg-btn active" id="step002" onclick="setLotStep(0.02)">0.02(跳號)</button>
@@ -677,140 +735,194 @@
           </div>
         </div>
 
-        <!-- 擴充後的總籤數橫向捲動選單 (3支 ~ 15支) -->
+        <!-- 自動換行滿版籤數按鈕，不截斷 -->
         <div class="ctrl-box">
           <div class="ctrl-head">
-            <span class="gen-label">③ 總共幾支籤 (可左右滑動點選)</span>
-            <span style="color:var(--primary); font-weight:700; font-size:0.76rem;" id="lotCountLabel">共 6 支籤</span>
+            <span class="gen-label">③ 總籤數</span>
+            <span style="color:var(--primary); font-weight:700; font-size:0.7rem;" id="lotCountLabel">共 8 支籤</span>
           </div>
-          <div class="chips-row" id="lotCountChips" style="margin-top:2px;"></div>
+          <div class="chips-wrap" id="lotCountChips"></div>
         </div>
 
+        <!-- 4欄緊湊網格 -->
         <div class="yi-grid" id="yiGrid"></div>
 
-        <!-- 連動「每支籤差」的單支快查滑桿 -->
         <div class="inspector-box">
           <div class="inspector-top">
             <span style="color:var(--text-muted);">
-              🔍 單支快查 <span class="step-badge" id="quickStepBadge">連動步進 0.02</span>
+              🔍 單支快查 <span class="step-badge" id="quickStepBadge">步進 0.02</span>
             </span>
             <span>
               <strong style="color:var(--gold);" id="quickRateTxt">0.80 籤</strong> ➔ 
-              <strong style="color:var(--primary); font-size:1rem;" id="quickScoreTxt">214 分</strong>
+              <strong style="color:var(--primary); font-size:0.95rem;" id="quickScoreTxt">214 分</strong>
             </span>
           </div>
           <div class="slider-row">
-            <button class="step-btn" style="width:28px;height:24px;font-size:0.75rem;" onclick="stepQuickInspect(-1)">-</button>
+            <button class="step-btn" style="width:26px;height:22px;font-size:0.72rem;" onclick="stepQuickInspect(-1)">-</button>
             <input type="range" id="quickInspectSlider" min="0.50" max="0.90" step="0.02" value="0.80" oninput="updateQuickInspect()">
-            <button class="step-btn" style="width:28px;height:24px;font-size:0.75rem;" onclick="stepQuickInspect(1)">+</button>
+            <button class="step-btn" style="width:26px;height:22px;font-size:0.72rem;" onclick="stepQuickInspect(1)">+</button>
           </div>
         </div>
       </div>
 
+      <!-- 單局丙標：現在不用滾動也能直接看到 -->
       <div class="generator-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:0.8rem; font-weight:800; color:var(--purple);">⚡ 單局丙標預測</span>
-          <span style="font-size:0.72rem; color:var(--text-muted);" id="bingBaseHint">基準: 乙標 0.80 (214分)</span>
+          <span style="font-size:0.76rem; font-weight:800; color:var(--purple);">⚡ 單局丙標預測</span>
+          <span style="font-size:0.68rem; color:var(--text-muted);" id="bingBaseHint">基準: 乙標 0.80 (214分)</span>
         </div>
 
         <div class="seg-group" style="display:grid; grid-template-columns:1fr 1fr;">
           <button class="seg-btn active" id="bModeMinus" onclick="setBingMode('minus')">乙標扣分 (-10 ~ -35)</button>
-          <button class="seg-btn" id="bModeLot" onclick="setBingMode('lot')">甲標再抽低籤 (-0.06起)</button>
+          <button class="seg-btn" id="bModeLot" onclick="setBingMode('lot')">甲標再抽低籤</button>
         </div>
 
         <div class="bing-grid" id="bingGrid"></div>
       </div>
     </div>
 
-    <!-- ==================== 分頁 3：總分標會與名次階梯 ==================== -->
+    <!-- ==================== 分頁 3：總分標會 (前N局預估最後一局 + 個人控分反推) ==================== -->
     <div id="tabTotal" class="tab-view">
       <div class="top-bar">
-        <h1>📊 總分標會 (甲1~丙8)</h1>
+        <h1>📊 總分尾局預估</h1>
         <div class="pill-group">
-          <button class="pill-btn" id="g3" onclick="setTotalGames(3)">3局</button>
-          <button class="pill-btn" id="g4" onclick="setTotalGames(4)">4局</button>
-          <button class="pill-btn" id="g5" onclick="setTotalGames(5)">5局</button>
-          <button class="pill-btn active-emerald" id="g6" onclick="setTotalGames(6)">6局</button>
+          <button class="pill-btn" id="g4" onclick="setTotalGames(4)">4局制</button>
+          <button class="pill-btn active-emerald" id="g5" onclick="setTotalGames(5)">5局制</button>
+          <button class="pill-btn" id="g6" onclick="setTotalGames(6)">6局制</button>
         </div>
       </div>
 
+      <!-- 賽前尾局預估甲1核心面板 -->
       <div class="hero-card emerald-theme">
-        <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--emerald); font-weight:700;">
-          <span id="totalJiaTitle">👑 總分甲1 (6局最高總分)</span>
-          <span style="color:var(--gold); font-weight:700;" id="totalAvgBadge">平均 225.0 / 局</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+          <span style="font-size:0.74rem; color:var(--emerald); font-weight:800;" id="tModeTitle">👑 領先者戰況 (已打4局 + 預估第5局)</span>
+          <div class="seg-group">
+            <button class="seg-btn active" id="estModePre" onclick="setEstMode('pre')">尾局前預估</button>
+            <button class="seg-btn" id="estModeDone" onclick="setEstMode('done')">完賽總分</button>
+          </div>
         </div>
-        <div class="jia-main">
-          <button class="step-btn" onclick="stepTotalJia(-20)">-20</button>
-          <button class="step-btn" onclick="stepTotalJia(-5)">-5</button>
-          <input type="number" id="totalJiaInput" class="big-input emerald-txt" value="1350" min="300" max="2400" oninput="onTotalJiaInput()">
-          <button class="step-btn" onclick="stepTotalJia(5)">+5</button>
-          <button class="step-btn" onclick="stepTotalJia(20)">+20</button>
+
+        <!-- 模式 A：打最後一局前的「前N局 + 預估尾局」雙欄輸入 -->
+        <div id="preEstPanel">
+          <div class="est-grid">
+            <div class="est-box">
+              <div class="est-box-title">
+                <span id="prevGamesLabel">領先者前 4 局總分</span>
+                <span style="color:var(--emerald);" id="prevAvgTxt">均225</span>
+              </div>
+              <div class="mini-num-ctrl">
+                <button class="step-btn" style="width:28px;height:28px;" onclick="stepPrevSum(-10)">-10</button>
+                <input type="number" id="leaderPrevInput" class="mini-input" value="900" oninput="onLeaderPrevInput()">
+                <button class="step-btn" style="width:28px;height:28px;" onclick="stepPrevSum(10)">+10</button>
+              </div>
+            </div>
+
+            <div class="est-box">
+              <div class="est-box-title">
+                <span id="lastGameLabel">預估他第 5 局打</span>
+                <span style="color:var(--gold);">尾局劇本</span>
+              </div>
+              <div class="mini-num-ctrl">
+                <button class="step-btn" style="width:28px;height:28px;" onclick="stepLastEst(-5)">-5</button>
+                <input type="number" id="leaderLastInput" class="mini-input" style="color:var(--gold);" value="225" oninput="onLeaderLastInput()">
+                <button class="step-btn" style="width:28px;height:28px;" onclick="stepLastEst(5)">+5</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 領先者最後一局劇本快選 -->
+          <div class="chips-wrap" style="margin-top:5px;">
+            <button class="chip" onclick="setLastScenario('avg')">照均分打</button>
+            <button class="chip" onclick="setLastScenario(190)">失常 190</button>
+            <button class="chip" onclick="setLastScenario(210)">保守 210</button>
+            <button class="chip" onclick="setLastScenario(230)">高檔 230</button>
+            <button class="chip" onclick="setLastScenario(255)">爆發 255</button>
+            <button class="chip" onclick="setLastScenario(279)">神仙 279</button>
+          </div>
         </div>
-        <div class="chips-row" id="totalQuickChips"></div>
+
+        <!-- 模式 B：已經打完的最終甲1總分輸入 -->
+        <div id="doneEstPanel" style="display:none;">
+          <div class="jia-main">
+            <button class="step-btn" onclick="stepDirectTotal(-20)">-20</button>
+            <button class="step-btn" onclick="stepDirectTotal(-5)">-5</button>
+            <input type="number" id="directTotalInput" class="big-input emerald-txt" value="1125" oninput="onDirectTotalInput()">
+            <button class="step-btn" onclick="stepDirectTotal(5)">+5</button>
+            <button class="step-btn" onclick="stepDirectTotal(20)">+20</button>
+          </div>
+        </div>
+
+        <!-- 最終推算出的預估甲1總分橫幅 -->
+        <div class="proj-banner">
+          <div>
+            <div style="font-size:0.65rem; color:var(--text-muted);">預估最終【總分甲1】基準</div>
+            <div style="font-size:0.72rem; color:var(--emerald); font-weight:700;" id="projFormulaTxt">900 + 225 = 1125 (均 225.0)</div>
+          </div>
+          <div style="font-size:1.65rem; font-weight:900; color:var(--gold);" id="projTotalDisplay">1125</div>
+        </div>
+
+        <!-- 個人前 N 局分數輸入：自動反推自己最後一局要打幾分才能中乙1/丙1 -->
+        <div class="my-score-bar" style="margin-top:6px;">
+          <div style="font-size:0.72rem;">
+            <span style="color:var(--gold); font-weight:800;">🎯 我目前前 <span id="myPrevGamesNum">4</span> 局總分：</span>
+            <div style="font-size:0.62rem; color:var(--text-muted);">輸入後下方自動顯示「尾局需打幾分」</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:4px;">
+            <button class="step-btn" style="width:26px;height:26px;" onclick="stepMyPrev(-10)">-10</button>
+            <input type="number" id="myPrevInput" class="mini-input" style="width:68px; font-size:1.15rem; color:var(--gold); border-bottom:1px solid var(--gold);" value="700" oninput="onMyPrevInput()">
+            <button class="step-btn" style="width:26px;height:26px;" onclick="stepMyPrev(10)">+10</button>
+          </div>
+        </div>
       </div>
 
+      <!-- 總分乙1 籤筒產生器 -->
       <div class="generator-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:0.8rem; font-weight:800; color:var(--primary);">🎯 總分乙1 抽籤試算 (點擊連動丙1)</span>
-          <span style="font-size:0.72rem; color:var(--text-muted);" id="totalYiSummary">區間: 1026~1134</span>
-        </div>
-
-        <div class="ctrl-box">
-          <div class="ctrl-head">
-            <span class="gen-label">① 總分最高籤 (起點)</span>
-            <span style="color:var(--gold); font-weight:800; font-size:0.86rem;" id="tStartRateVal">0.84 籤</span>
-          </div>
-          <div class="slider-row" style="margin-top:2px;">
-            <button class="step-btn" style="width:28px;height:24px;font-size:0.75rem;" onclick="stepTStartRate(-0.01)">-</button>
-            <input type="range" id="tStartRateSlider" class="emerald-slider" min="0.50" max="0.90" step="0.01" value="0.84" oninput="onTGenChange()">
-            <button class="step-btn" style="width:28px;height:24px;font-size:0.75rem;" onclick="stepTStartRate(0.01)">+</button>
-          </div>
+          <span style="font-size:0.76rem; font-weight:800; color:var(--primary);">🎯 預估【總分乙1】落點與尾局目標</span>
+          <span style="font-size:0.68rem; color:var(--text-muted);" id="totalYiSummary">區間: 833~945</span>
         </div>
 
         <div class="gen-row">
-          <span class="gen-label">② 每支籤差</span>
+          <span class="gen-label">最高籤 <strong style="color:var(--gold);" id="tStartRateVal">0.84</strong></span>
+          <div class="slider-row" style="flex:1; max-width:140px;">
+            <button class="step-btn" style="width:22px;height:20px;font-size:0.68rem;" onclick="stepTStartRate(-0.01)">-</button>
+            <input type="range" id="tStartRateSlider" class="emerald-slider" min="0.50" max="0.90" step="0.01" value="0.84" oninput="onTGenChange()">
+            <button class="step-btn" style="width:22px;height:20px;font-size:0.68rem;" onclick="stepTStartRate(0.01)">+</button>
+          </div>
           <div class="seg-group">
-            <button class="seg-btn" id="tStep001" onclick="setTLotStep(0.01)">0.01(連號)</button>
-            <button class="seg-btn active" id="tStep002" onclick="setTLotStep(0.02)">0.02(跳號)</button>
-            <button class="seg-btn" id="tStep003" onclick="setTLotStep(0.03)">0.03</button>
+            <button class="seg-btn" id="tStep001" onclick="setTLotStep(0.01)">0.01</button>
+            <button class="seg-btn active" id="tStep002" onclick="setTLotStep(0.02)">0.02</button>
             <button class="seg-btn" id="tStep005" onclick="setTLotStep(0.05)">0.05</button>
           </div>
         </div>
 
-        <!-- 總分頁同步擴充：3支 ~ 15支籤快選 -->
-        <div class="ctrl-box">
-          <div class="ctrl-head">
-            <span class="gen-label">③ 總共幾支籤</span>
-            <span style="color:var(--primary); font-weight:700; font-size:0.76rem;" id="tLotCountLabel">共 6 支籤</span>
-          </div>
-          <div class="chips-row" id="tLotCountChips" style="margin-top:2px;"></div>
-        </div>
+        <div class="chips-wrap" id="tLotCountChips"></div>
 
         <div class="yi-grid" id="totalYiGrid"></div>
 
-        <!-- 連動籤距的總分單籤快查滑桿 -->
         <div class="inspector-box">
           <div class="inspector-top">
             <span style="color:var(--text-muted);">
-              🔍 乙1單支快查 <span class="step-badge" id="tQuickStepBadge">連動步進 0.02</span>
+              🔍 乙1單籤快查 <span class="step-badge" id="tQuickStepBadge">步進 0.02</span>
             </span>
             <span>
               <strong style="color:var(--gold);" id="tQuickRateTxt">0.80 籤</strong> ➔ 
-              <strong style="color:var(--primary); font-size:1rem;" id="tQuickScoreTxt">1080 分</strong>
+              <strong style="color:var(--primary); font-size:0.92rem;" id="tQuickScoreTxt">900 分</strong>
             </span>
           </div>
           <div class="slider-row">
-            <button class="step-btn" style="width:28px;height:24px;font-size:0.75rem;" onclick="stepTQuickInspect(-1)">-</button>
+            <button class="step-btn" style="width:26px;height:22px;font-size:0.72rem;" onclick="stepTQuickInspect(-1)">-</button>
             <input type="range" id="tQuickSlider" min="0.50" max="0.90" step="0.02" value="0.80" oninput="updateTQuickInspect()">
-            <button class="step-btn" style="width:28px;height:24px;font-size:0.75rem;" onclick="stepTQuickInspect(1)">+</button>
+            <button class="step-btn" style="width:26px;height:22px;font-size:0.72rem;" onclick="stepTQuickInspect(1)">+</button>
           </div>
         </div>
       </div>
 
+      <!-- 總分丙1 試算 -->
       <div class="generator-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:0.8rem; font-weight:800; color:var(--purple);">⚡ 總分丙1 試算 (點擊可指定丙1基準)</span>
-          <span style="font-size:0.7rem; color:var(--text-muted);" id="totalBingHint">基準: 乙1=1080分</span>
+          <span style="font-size:0.76rem; font-weight:800; color:var(--purple);">⚡ 預估【總分丙1】與尾局目標</span>
+          <span style="font-size:0.68rem; color:var(--text-muted);" id="totalBingHint">基準: 乙1=900分</span>
         </div>
 
         <div class="seg-group" style="display:grid; grid-template-columns:repeat(3, 1fr);">
@@ -822,27 +934,24 @@
         <div class="bing-grid" id="totalBingGrid"></div>
       </div>
 
+      <!-- 甲1~8 / 乙1~8 / 丙1~8 排名落點預估階梯表 -->
       <div class="generator-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:0.8rem; font-weight:800; color:var(--gold);">🏅 甲/乙/丙 1~8 名次落點預估表</span>
+          <span style="font-size:0.76rem; font-weight:800; color:var(--gold);">🏅 甲/乙/丙 1~8 名落點與尾局所需分</span>
           <div class="seg-group">
             <button class="seg-btn" id="gap1" onclick="setRankGap(1)">差1分</button>
             <button class="seg-btn active" id="gap3" onclick="setRankGap(3)">差3分</button>
             <button class="seg-btn" id="gap5" onclick="setRankGap(5)">差5分</button>
-            <button class="seg-btn" id="gap8" onclick="setRankGap(8)">差8分</button>
           </div>
-        </div>
-        <div style="font-size:0.68rem; color:var(--text-muted);">
-          ※ 以目前選中的 <strong>甲1</strong>、<strong>乙1</strong>、<strong>丙1</strong> 為第1名基準，依序推算 1~8 名落點與單局均分：
         </div>
 
         <table class="rank-table">
           <thead>
             <tr>
-              <th style="width:16%; color:var(--text-muted);">名次</th>
+              <th style="width:14%; color:var(--text-muted);">名次</th>
               <th style="width:28%; color:var(--emerald);">甲標 (1~8)</th>
-              <th style="width:28%; color:var(--primary);">乙標 (1~8)</th>
-              <th style="width:28%; color:var(--purple);">丙標 (1~8)</th>
+              <th style="width:29%; color:var(--primary);">乙標 (1~8)</th>
+              <th style="width:29%; color:var(--purple);">丙標 (1~8)</th>
             </tr>
           </thead>
           <tbody id="rankLadderBody"></tbody>
@@ -884,17 +993,13 @@
       else renderTotal();
     }
 
-    /* ================= 共用輔助：讓快查滑桿完美對齊「最高籤起點」與「籤距(Step)」 ================= */
-    const LOT_COUNT_OPTIONS = [3, 4, 5, 6, 7, 8, 9, 10, 12, 15];
+    const LOT_COUNT_OPTIONS = [4, 5, 6, 7, 8, 9, 10, 12];
 
     function syncInspectorSlider(sliderId, badgeId, topStartRate, stepSize, currentSelRate) {
       const slider = document.getElementById(sliderId);
       const badge = document.getElementById(badgeId);
-      badge.innerText = `連動步進 ${stepSize.toFixed(2)}`;
+      badge.innerText = `步進 ${stepSize.toFixed(2)}`;
 
-      // 根據 topStartRate 往回推算 >= 0.50 的最小對齊起點，以及 <= 0.90 的最大對齊終點
-      // 這樣若最高籤是 0.85 (奇數)、籤距 0.02，滑桿就會踏在 0.51, 0.53 ... 0.85, 0.87, 0.89
-      // 若最高籤是 0.84 (偶數)、籤距 0.02，滑桿就會踏在 0.50, 0.52 ... 0.84, 0.86, 0.88, 0.90
       const stepsDown = Math.floor((topStartRate - 0.50 + 1e-9) / stepSize);
       const alignedMin = Math.round((topStartRate - stepsDown * stepSize) * 100) / 100;
 
@@ -905,7 +1010,6 @@
       slider.max = alignedMax.toFixed(2);
       slider.step = stepSize.toFixed(2);
 
-      // 將目前選中的籤號吸附到最近的對齊格位上
       const k = Math.round((currentSelRate - alignedMin) / stepSize);
       let snapped = Math.round((alignedMin + k * stepSize) * 100) / 100;
       snapped = Math.max(alignedMin, Math.min(alignedMax, snapped));
@@ -1077,7 +1181,7 @@
     let roundMode = 'round';
     let startRate = 0.84;
     let lotStep = 0.02;
-    let lotCount = 6;
+    let lotCount = 8; // 預設8支剛好2排4欄
     let selectedYiRate = 0.80;
     let bingMode = 'minus';
 
@@ -1099,7 +1203,7 @@
     function setJia(val) {
       jiaScore = val;
       document.getElementById('jiaInput').value = val;
-      document.querySelectorAll('#tabBiao .hero-card .chip').forEach(c => c.classList.toggle('active', parseInt(c.innerText, 10) === val));
+      document.querySelectorAll('#jiaChips .chip').forEach(c => c.classList.toggle('active', parseInt(c.innerText, 10) === val));
       renderBiao();
     }
 
@@ -1119,7 +1223,6 @@
     function onGenChange() {
       startRate = parseFloat(document.getElementById('startRateSlider').value);
       document.getElementById('startRateVal').innerText = startRate.toFixed(2) + ' 籤';
-      // 同步對齊下方快查滑桿
       selectedYiRate = syncInspectorSlider('quickInspectSlider', 'quickStepBadge', startRate, lotStep, selectedYiRate);
       renderBiao();
     }
@@ -1130,7 +1233,6 @@
       document.getElementById('step002').classList.toggle('active', step === 0.02);
       document.getElementById('step003').classList.toggle('active', step === 0.03);
       document.getElementById('step005').classList.toggle('active', step === 0.05);
-      // 當切換每支籤差時，立即讓下方快查滑桿改變 step 並對齊格位
       selectedYiRate = syncInspectorSlider('quickInspectSlider', 'quickStepBadge', startRate, lotStep, selectedYiRate);
       renderBiao();
     }
@@ -1169,7 +1271,6 @@
     }
 
     function renderBiao() {
-      // 渲染 3~15 支籤的膠囊按鈕列
       document.getElementById('lotCountLabel').innerText = `共 ${lotCount} 支籤`;
       let cntHtml = '';
       LOT_COUNT_OPTIONS.forEach(c => {
@@ -1177,7 +1278,6 @@
       });
       document.getElementById('lotCountChips').innerHTML = cntHtml;
 
-      // 確保快查滑桿與目前籤差保持同步
       syncInspectorSlider('quickInspectSlider', 'quickStepBadge', startRate, lotStep, selectedYiRate);
 
       const rates = [];
@@ -1188,7 +1288,7 @@
 
       const maxScore = applyRound(jiaScore * rates[0]);
       const minScore = applyRound(jiaScore * rates[rates.length - 1]);
-      document.getElementById('poolRangeSummary').innerText = `本筒範圍: ${minScore} ~ ${maxScore} 分`;
+      document.getElementById('poolRangeSummary').innerText = `本筒: ${minScore} ~ ${maxScore} 分`;
 
       let yiHtml = '';
       rates.forEach(r => {
@@ -1197,7 +1297,7 @@
         const isSel = Math.abs(r - selectedYiRate) < 0.001;
         yiHtml += `
           <div class="lot-card ${isSel ? 'selected' : ''}" onclick="selectYi(${r})">
-            <div class="lot-rate">${r.toFixed(2)} 籤</div>
+            <div class="lot-rate">${r.toFixed(2)}籤</div>
             <div class="lot-score">${score}</div>
             <div class="lot-exact">${exact.toFixed(1)}</div>
           </div>
@@ -1230,7 +1330,7 @@
           const exact = jiaScore * bRate;
           bingHtml += `
             <div class="bing-card">
-              <div class="bing-title">${bRate.toFixed(2)} 籤</div>
+              <div class="bing-title">${bRate.toFixed(2)}籤</div>
               <div class="bing-val">${applyRound(exact)}</div>
               <div class="lot-exact">${exact.toFixed(1)}</div>
             </div>
@@ -1240,45 +1340,129 @@
       document.getElementById('bingGrid').innerHTML = bingHtml;
     }
 
-    /* ================= 分頁 3：總分標會 (甲1~8 / 乙1~8 / 丙1~8) 邏輯 ================= */
-    let totalGames = 6;
-    let totalJia = 1350;
+    /* ================= 分頁 3：總分尾局預估與控分反推邏輯 ================= */
+    let totalGames = 5;       // 預設 5 局制 (打完 4 局預估第 5 局)
+    let estMode = 'pre';      // 'pre' (尾局前預估) | 'done' (已完賽總分)
+    let leaderPrevSum = 900;  // 領先者前 N-1 局總分 (如 4 局 900 分)
+    let leaderLastEst = 225;  // 預估領先者最後一局分數
+    let directTotalJia = 1125;// 若選完賽總分模式的甲1總分
+    let myPrevSum = 700;      // 使用者自己前 N-1 局的總分
+
     let tStartRate = 0.84;
     let tLotStep = 0.02;
-    let tLotCount = 6;
+    let tLotCount = 8;
     let tSelectedYiRate = 0.80;
     let tBingMode = 'mult';
     let tSelectedBingIdx = 1;
     let rankGap = 3;
 
+    function getProjectedJia() {
+      return estMode === 'pre' ? (leaderPrevSum + leaderLastEst) : directTotalJia;
+    }
+
+    // 計算「我最後一局需要打幾分」的輔助標籤
+    function getNeedBadgeHtml(targetTotal) {
+      if (estMode !== 'pre') {
+        return `<div class="lot-exact">均 ${(targetTotal / totalGames).toFixed(1)}</div>`;
+      }
+      const need = targetTotal - myPrevSum;
+      if (need > 300) {
+        return `<div class="lot-exact" style="color:#f87171;">尾局需${need}(超)</div>`;
+      } else if (need <= 0) {
+        return `<div class="lot-exact" style="color:#94a3b8;">已超過(${need})</div>`;
+      } else {
+        return `<div class="need-tag">尾局打 ${need}</div>`;
+      }
+    }
+
     function setTotalGames(g) {
-      const oldAvg = totalJia / totalGames;
+      const prevG = totalGames - 1;
+      const oldLeaderAvg = leaderPrevSum / prevG;
+      const oldMyAvg = myPrevSum / prevG;
+
       totalGames = g;
-      ['g3', 'g4', 'g5', 'g6'].forEach(id => {
+      const newPrevG = g - 1;
+
+      ['g4', 'g5', 'g6'].forEach(id => {
         document.getElementById(id).className = 'pill-btn ' + (id === 'g' + g ? 'active-emerald' : '');
       });
-      document.getElementById('totalJiaTitle').innerText = `👑 總分甲1 (${g}局最高總分)`;
-      totalJia = Math.round((oldAvg * g) / 5) * 5;
-      document.getElementById('totalJiaInput').value = totalJia;
+
+      leaderPrevSum = Math.round((oldLeaderAvg * newPrevG) / 5) * 5;
+      myPrevSum = Math.round((oldMyAvg * newPrevG) / 5) * 5;
+      directTotalJia = leaderPrevSum + leaderLastEst;
+
+      document.getElementById('leaderPrevInput').value = leaderPrevSum;
+      document.getElementById('myPrevInput').value = myPrevSum;
+      document.getElementById('directTotalInput').value = directTotalJia;
       renderTotal();
     }
 
-    function setTotalJia(val) {
-      totalJia = val;
-      document.getElementById('totalJiaInput').value = val;
-      renderTotal();
-    }
-
-    function stepTotalJia(delta) {
-      setTotalJia(Math.max(300, Math.min(2400, totalJia + delta)));
-    }
-
-    function onTotalJiaInput() {
-      const v = parseInt(document.getElementById('totalJiaInput').value, 10);
-      if (!isNaN(v)) {
-        totalJia = Math.max(100, Math.min(2400, v));
-        renderTotal();
+    function setEstMode(mode) {
+      estMode = mode;
+      document.getElementById('estModePre').classList.toggle('active', mode === 'pre');
+      document.getElementById('estModeDone').classList.toggle('active', mode === 'done');
+      document.getElementById('preEstPanel').style.display = (mode === 'pre') ? 'block' : 'none';
+      document.getElementById('doneEstPanel').style.display = (mode === 'done') ? 'block' : 'none';
+      if (mode === 'done') {
+        directTotalJia = leaderPrevSum + leaderLastEst;
+        document.getElementById('directTotalInput').value = directTotalJia;
       }
+      renderTotal();
+    }
+
+    function stepPrevSum(delta) {
+      leaderPrevSum = Math.max(100, Math.min(2000, leaderPrevSum + delta));
+      document.getElementById('leaderPrevInput').value = leaderPrevSum;
+      renderTotal();
+    }
+
+    function onLeaderPrevInput() {
+      const v = parseInt(document.getElementById('leaderPrevInput').value, 10);
+      if (!isNaN(v)) { leaderPrevSum = Math.max(0, Math.min(2000, v)); renderTotal(); }
+    }
+
+    function stepLastEst(delta) {
+      leaderLastEst = Math.max(0, Math.min(300, leaderLastEst + delta));
+      document.getElementById('leaderLastInput').value = leaderLastEst;
+      renderTotal();
+    }
+
+    function onLeaderLastInput() {
+      const v = parseInt(document.getElementById('leaderLastInput').value, 10);
+      if (!isNaN(v)) { leaderLastEst = Math.max(0, Math.min(300, v)); renderTotal(); }
+    }
+
+    function setLastScenario(val) {
+      const prevG = totalGames - 1;
+      if (val === 'avg') {
+        leaderLastEst = Math.round(leaderPrevSum / prevG);
+      } else {
+        leaderLastEst = val;
+      }
+      document.getElementById('leaderLastInput').value = leaderLastEst;
+      renderTotal();
+    }
+
+    function stepDirectTotal(delta) {
+      directTotalJia = Math.max(300, Math.min(2400, directTotalJia + delta));
+      document.getElementById('directTotalInput').value = directTotalJia;
+      renderTotal();
+    }
+
+    function onDirectTotalInput() {
+      const v = parseInt(document.getElementById('directTotalInput').value, 10);
+      if (!isNaN(v)) { directTotalJia = Math.max(100, Math.min(2400, v)); renderTotal(); }
+    }
+
+    function stepMyPrev(delta) {
+      myPrevSum = Math.max(0, Math.min(2000, myPrevSum + delta));
+      document.getElementById('myPrevInput').value = myPrevSum;
+      renderTotal();
+    }
+
+    function onMyPrevInput() {
+      const v = parseInt(document.getElementById('myPrevInput').value, 10);
+      if (!isNaN(v)) { myPrevSum = Math.max(0, Math.min(2000, v)); renderTotal(); }
     }
 
     function stepTStartRate(delta) {
@@ -1289,7 +1473,7 @@
 
     function onTGenChange() {
       tStartRate = parseFloat(document.getElementById('tStartRateSlider').value);
-      document.getElementById('tStartRateVal').innerText = tStartRate.toFixed(2) + ' 籤';
+      document.getElementById('tStartRateVal').innerText = tStartRate.toFixed(2);
       tSelectedYiRate = syncInspectorSlider('tQuickSlider', 'tQuickStepBadge', tStartRate, tLotStep, tSelectedYiRate);
       renderTotal();
     }
@@ -1298,7 +1482,6 @@
       tLotStep = step;
       document.getElementById('tStep001').classList.toggle('active', step === 0.01);
       document.getElementById('tStep002').classList.toggle('active', step === 0.02);
-      document.getElementById('tStep003').classList.toggle('active', step === 0.03);
       document.getElementById('tStep005').classList.toggle('active', step === 0.05);
       tSelectedYiRate = syncInspectorSlider('tQuickSlider', 'tQuickStepBadge', tStartRate, tLotStep, tSelectedYiRate);
       renderTotal();
@@ -1345,27 +1528,32 @@
 
     function setRankGap(gap) {
       rankGap = gap;
-      [1, 3, 5, 8].forEach(g => {
+      [1, 3, 5].forEach(g => {
         document.getElementById('gap' + g).classList.toggle('active', g === gap);
       });
       renderTotal();
     }
 
     function renderTotal() {
-      const avg = totalJia / totalGames;
-      document.getElementById('totalAvgBadge').innerText = `平均 ${avg.toFixed(1)} / 局`;
+      const prevG = totalGames - 1;
+      const projJia = getProjectedJia();
+      const prevAvg = (leaderPrevSum / prevG).toFixed(1);
+      const totalAvg = (projJia / totalGames).toFixed(1);
 
-      const avgPresets = [240, 230, 225, 220, 215, 210, 200];
-      let chipsHtml = '';
-      avgPresets.forEach(a => {
-        const sc = a * totalGames;
-        const active = (sc === totalJia) ? 'active-em' : '';
-        chipsHtml += `<button class="chip ${active}" onclick="setTotalJia(${sc})">${sc} (均${a})</button>`;
-      });
-      document.getElementById('totalQuickChips').innerHTML = chipsHtml;
+      document.getElementById('tModeTitle').innerText = `👑 ${totalGames}局制 (已打${prevG}局 + 預估第${totalGames}局)`;
+      document.getElementById('prevGamesLabel').innerText = `領先者前 ${prevG} 局`;
+      document.getElementById('prevAvgTxt').innerText = `均 ${prevAvg}`;
+      document.getElementById('lastGameLabel').innerText = `預估他第 ${totalGames} 局`;
+      document.getElementById('myPrevGamesNum').innerText = prevG;
 
-      // 渲染總分 3~15 支籤選項
-      document.getElementById('tLotCountLabel').innerText = `共 ${tLotCount} 支籤`;
+      if (estMode === 'pre') {
+        document.getElementById('projFormulaTxt').innerText = `前${prevG}局(${leaderPrevSum}) + 尾局(${leaderLastEst}) = 均 ${totalAvg}`;
+      } else {
+        document.getElementById('projFormulaTxt').innerText = `${totalGames}局完賽總分 · 平均 ${totalAvg} / 局`;
+      }
+      document.getElementById('projTotalDisplay').innerText = projJia;
+
+      // 渲染總分籤數選擇
       let tCntHtml = '';
       LOT_COUNT_OPTIONS.forEach(c => {
         tCntHtml += `<button class="chip ${c === tLotCount ? 'active-em' : ''}" onclick="setTLotCount(${c})">${c}支</button>`;
@@ -1380,49 +1568,49 @@
         if (r >= 0.35) rates.push(r);
       }
 
-      const maxYi = applyRound(totalJia * rates[0]);
-      const minYi = applyRound(totalJia * rates[rates.length - 1]);
+      const maxYi = applyRound(projJia * rates[0]);
+      const minYi = applyRound(projJia * rates[rates.length - 1]);
       document.getElementById('totalYiSummary').innerText = `本筒乙1: ${minYi} ~ ${maxYi}`;
 
       let yiHtml = '';
       rates.forEach(r => {
-        const exact = totalJia * r;
-        const score = applyRound(exact);
-        const pAvg = (score / totalGames).toFixed(1);
+        const score = applyRound(projJia * r);
         const isSel = Math.abs(r - tSelectedYiRate) < 0.001;
         yiHtml += `
           <div class="lot-card ${isSel ? 'selected' : ''}" onclick="selectTYi(${r})">
-            <div class="lot-rate">${r.toFixed(2)} 籤</div>
+            <div class="lot-rate">${r.toFixed(2)}籤</div>
             <div class="lot-score">${score}</div>
-            <div class="lot-exact">均 ${pAvg}/局</div>
+            ${getNeedBadgeHtml(score)}
           </div>
         `;
       });
       document.getElementById('totalYiGrid').innerHTML = yiHtml;
 
-      const yi1Score = applyRound(totalJia * tSelectedYiRate);
+      const yi1Score = applyRound(projJia * tSelectedYiRate);
+      const myNeedYi1 = yi1Score - myPrevSum;
       document.getElementById('tQuickRateTxt').innerText = tSelectedYiRate.toFixed(2) + ' 籤';
-      document.getElementById('tQuickScoreTxt').innerText = `${yi1Score} 分 (均${(yi1Score / totalGames).toFixed(1)})`;
+      document.getElementById('tQuickScoreTxt').innerText = `${yi1Score}分 (尾局打${myNeedYi1})`;
 
+      // 渲染丙1
       document.getElementById('totalBingHint').innerText = `基準: 乙1 (${tSelectedYiRate.toFixed(2)}) = ${yi1Score}分`;
       const bingOptions = [];
 
       if (tBingMode === 'mult') {
         [0.92, 0.90, 0.88, 0.85, 0.82, 0.80].forEach(m => {
           const sc = applyRound(yi1Score * m);
-          bingOptions.push({ label: `乙1 × ${m.toFixed(2)}`, score: sc, sub: `均 ${(sc / totalGames).toFixed(1)}` });
+          bingOptions.push({ label: `乙1×${m.toFixed(2)}`, score: sc });
         });
       } else if (tBingMode === 'minus') {
         [40, 50, 60, 80, 100, 120].forEach(diff => {
           const sc = Math.max(0, yi1Score - diff);
-          bingOptions.push({ label: `乙1 - ${diff}分`, score: sc, sub: `均 ${(sc / totalGames).toFixed(1)}` });
+          bingOptions.push({ label: `乙1-${diff}分`, score: sc });
         });
       } else {
         [1, 2, 3, 4, 5, 6].forEach(mult => {
           const drop = mult * tLotStep;
           const br = Math.max(0.35, Math.round((tSelectedYiRate - drop) * 100) / 100);
-          const sc = applyRound(totalJia * br);
-          bingOptions.push({ label: `甲1 × ${br.toFixed(2)}`, score: sc, sub: `均 ${(sc / totalGames).toFixed(1)}` });
+          const sc = applyRound(projJia * br);
+          bingOptions.push({ label: `甲1×${br.toFixed(2)}`, score: sc });
         });
       }
 
@@ -1433,7 +1621,7 @@
           <div class="bing-card ${isSel ? 'selected' : ''}" onclick="selectTBingCard(${idx})">
             <div class="bing-title">${opt.label}</div>
             <div class="bing-val">${opt.score}</div>
-            <div class="lot-exact">${opt.sub}</div>
+            ${getNeedBadgeHtml(opt.score)}
           </div>
         `;
       });
@@ -1441,28 +1629,33 @@
 
       const bing1Score = bingOptions[tSelectedBingIdx] ? bingOptions[tSelectedBingIdx].score : bingOptions[0].score;
 
+      // 渲染 1~8 名落點與尾局所需分
       let tableHtml = '';
       for (let rank = 1; rank <= 8; rank++) {
         const drop = (rank - 1) * rankGap;
-        const jVal = Math.max(0, totalJia - drop);
+        const jVal = Math.max(0, projJia - drop);
         const yVal = Math.max(0, yi1Score - drop);
         const bVal = Math.max(0, bing1Score - drop);
         const isFirst = (rank === 1);
 
+        const jSub = estMode === 'pre' ? `尾局 ${jVal - myPrevSum}` : `均 ${(jVal / totalGames).toFixed(1)}`;
+        const ySub = estMode === 'pre' ? `尾局 ${yVal - myPrevSum}` : `均 ${(yVal / totalGames).toFixed(1)}`;
+        const bSub = estMode === 'pre' ? `尾局 ${bVal - myPrevSum}` : `均 ${(bVal / totalGames).toFixed(1)}`;
+
         tableHtml += `
           <tr class="${isFirst ? 'rank-head-row' : ''}">
-            <td style="color:${isFirst ? 'var(--gold)' : 'var(--text-muted)'};">${isFirst ? '👑 1名' : rank + '名'}</td>
+            <td style="color:${isFirst ? 'var(--gold)' : 'var(--text-muted)'};">${isFirst ? '👑1' : rank + '名'}</td>
             <td style="color:var(--emerald);">
-              甲${rank}：${jVal}
-              <div style="font-size:0.6rem; color:var(--text-dim); font-weight:500;">均 ${(jVal / totalGames).toFixed(1)}</div>
+              甲${rank}: ${jVal}
+              <div style="font-size:0.58rem; color:var(--text-muted);">${jSub}</div>
             </td>
             <td style="color:var(--primary);">
-              乙${rank}：${yVal}
-              <div style="font-size:0.6rem; color:var(--text-dim); font-weight:500;">均 ${(yVal / totalGames).toFixed(1)}</div>
+              乙${rank}: ${yVal}
+              <div style="font-size:0.58rem; color:var(--gold);">${ySub}</div>
             </td>
             <td style="color:var(--purple);">
-              丙${rank}：${bVal}
-              <div style="font-size:0.6rem; color:var(--text-dim); font-weight:500;">均 ${(bVal / totalGames).toFixed(1)}</div>
+              丙${rank}: ${bVal}
+              <div style="font-size:0.58rem; color:var(--gold);">${bSub}</div>
             </td>
           </tr>
         `;
