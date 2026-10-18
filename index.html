@@ -26,10 +26,9 @@
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --text-dim: #64748b;
-      /* 根據螢幕高度自動縮放的基準間距 */
       --gap-s: clamp(4px, 0.8dvh, 8px);
-      --gap-m: clamp(6px, 1.1dvh, 11px);
-      --pad-card: clamp(8px, 1.3dvh, 13px);
+      --gap-m: clamp(6px, 1.1dvh, 10px);
+      --pad-card: clamp(8px, 1.2dvh, 12px);
     }
 
     * {
@@ -69,7 +68,7 @@
       flex: 1;
       width: 100%;
       overflow-y: auto;
-      padding: 2px 10px 12px;
+      padding: 2px 10px 14px;
       scrollbar-width: none;
     }
     .tab-view::-webkit-scrollbar { display: none; }
@@ -80,14 +79,13 @@
       gap: var(--gap-m);
     }
 
-    /* 瞄準器分頁鎖定一頁滿版自動伸縮 */
     #tabAim.active {
       overflow: hidden;
       gap: var(--gap-s);
       padding-bottom: 6px;
     }
 
-    /* 底部導航列自適應高度 */
+    /* 底部導航列 */
     .bottom-nav {
       flex-shrink: 0;
       height: calc(clamp(48px, 6.5dvh, 56px) + env(safe-area-inset-bottom, 6px));
@@ -161,7 +159,7 @@
     .pill-btn.active-gold { background: rgba(251, 191, 36, 0.2); color: var(--gold); border: 1px solid rgba(251, 191, 36, 0.4); }
     .pill-btn.active-emerald { background: rgba(16, 185, 129, 0.2); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.4); }
 
-    /* ================= 分頁 1：瞄準器自適應 ================= */
+    /* ================= 分頁 1：瞄準器 ================= */
     .aim-result-card {
       background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       border: 1px solid var(--border-glass);
@@ -195,7 +193,7 @@
     .ctrl-box {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 3px;
     }
 
     .ctrl-head {
@@ -284,7 +282,7 @@
       transition: width 0.22s ease;
     }
 
-    /* ================= 分頁 2 & 3：自適應緊湊卡片 ================= */
+    /* ================= 分頁 2 & 3：卡片與自訂輸入元件 ================= */
     .hero-card {
       background: linear-gradient(145deg, rgba(30, 41, 59, 0.92) 0%, rgba(15, 23, 42, 0.96) 100%);
       border: 1px solid rgba(251, 191, 36, 0.35);
@@ -307,13 +305,13 @@
     }
 
     .step-btn {
-      width: clamp(32px, 8.5vw, 38px);
-      height: clamp(28px, 3.8dvh, 34px);
-      border-radius: 8px;
+      width: clamp(30px, 8vw, 36px);
+      height: clamp(26px, 3.6dvh, 32px);
+      border-radius: 7px;
       border: 1px solid var(--border-glass);
       background: rgba(255, 255, 255, 0.06);
       color: var(--text-main);
-      font-size: clamp(0.75rem, 2.8vw, 0.85rem);
+      font-size: clamp(0.72rem, 2.6vw, 0.82rem);
       font-weight: 700;
       cursor: pointer;
       flex-shrink: 0;
@@ -325,7 +323,7 @@
       background: transparent;
       border: none;
       text-align: center;
-      font-size: clamp(1.9rem, 4.2dvh, 2.35rem);
+      font-size: clamp(1.85rem, 4dvh, 2.3rem);
       font-weight: 900;
       color: var(--gold);
       text-shadow: 0 0 18px rgba(251, 191, 36, 0.35);
@@ -339,7 +337,7 @@
       text-shadow: 0 0 18px rgba(16, 185, 129, 0.35);
     }
 
-    /* 自動換行網格按鈕，不再被右邊螢幕切斷 */
+    /* 自動換行網格按鈕 */
     .chips-wrap {
       display: flex;
       flex-wrap: wrap;
@@ -348,14 +346,14 @@
 
     .chip {
       flex: 1 1 auto;
-      min-width: 42px;
+      min-width: 36px;
       text-align: center;
-      padding: 3px 6px;
+      padding: 3px 5px;
       border-radius: 6px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border-glass);
       color: var(--text-muted);
-      font-size: clamp(0.66rem, 2.5vw, 0.72rem);
+      font-size: clamp(0.64rem, 2.4vw, 0.7rem);
       font-weight: 600;
       cursor: pointer;
     }
@@ -368,6 +366,11 @@
       background: rgba(16, 185, 129, 0.22);
       color: var(--emerald);
       border-color: rgba(16, 185, 129, 0.5);
+    }
+    .chip.active-purp {
+      background: rgba(192, 132, 252, 0.25);
+      color: #e9d5ff;
+      border-color: var(--purple);
     }
 
     .generator-card {
@@ -410,7 +413,7 @@
       color: var(--text-muted);
       font-size: clamp(0.64rem, 2.4vw, 0.7rem);
       font-weight: 700;
-      padding: 3px 6px;
+      padding: 4px 6px;
       border-radius: 5px;
       cursor: pointer;
     }
@@ -420,11 +423,43 @@
       color: #090d16;
     }
 
-    /* 改為 4 欄緊湊網格，8支籤只要2排、12支籤只要3排，大幅節省高度 */
+    .seg-btn.active-purp {
+      background: var(--purple);
+      color: #090d16;
+    }
+
+    /* 小型自訂數字輸入框 (用於總籤數、自訂丙標參數) */
+    .inline-num-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: rgba(9, 13, 22, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 7px;
+      padding: 2px 4px;
+    }
+
+    .inline-input {
+      width: 44px;
+      background: transparent;
+      border: none;
+      color: var(--primary);
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-align: center;
+      outline: none;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    /* 4欄緊湊乙標網格 */
     .yi-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 5px;
+      max-height: 210px;
+      overflow-y: auto;
+      padding-right: 1px;
     }
 
     .lot-card {
@@ -443,11 +478,11 @@
       box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
     }
 
-    .lot-rate { font-size: clamp(0.6rem, 2.2vw, 0.66rem); color: var(--text-muted); font-weight: 600; }
-    .lot-score { font-size: clamp(1.1rem, 2.4dvh, 1.3rem); font-weight: 800; color: var(--text-main); line-height: 1.1; margin: 1px 0; }
+    .lot-rate { font-size: clamp(0.58rem, 2.1vw, 0.65rem); color: var(--text-muted); font-weight: 600; }
+    .lot-score { font-size: clamp(1.05rem, 2.3dvh, 1.28rem); font-weight: 800; color: var(--text-main); line-height: 1.1; margin: 1px 0; }
     .lot-card.selected .lot-score { color: var(--primary); }
-    .lot-exact { font-size: clamp(0.55rem, 2vw, 0.62rem); color: var(--text-dim); }
-    .need-tag { font-size: clamp(0.56rem, 2vw, 0.63rem); color: var(--gold); font-weight: 700; }
+    .lot-exact { font-size: clamp(0.54rem, 1.9vw, 0.6rem); color: var(--text-dim); }
+    .need-tag { font-size: clamp(0.55rem, 2vw, 0.62rem); color: var(--gold); font-weight: 700; }
 
     .inspector-box {
       background: rgba(9, 13, 22, 0.78);
@@ -467,12 +502,63 @@
     }
 
     .step-badge {
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       background: rgba(56, 189, 248, 0.15);
       color: var(--primary);
       border: 1px solid rgba(56, 189, 248, 0.3);
       padding: 1px 4px;
       border-radius: 4px;
+    }
+
+    /* 丙標自訂主控台與結果橫幅 */
+    .bing-custom-panel {
+      background: linear-gradient(135deg, rgba(192, 132, 252, 0.14), rgba(15, 23, 42, 0.9));
+      border: 1px solid rgba(192, 132, 252, 0.38);
+      border-radius: 11px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .bing-hero-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bing-input-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .bing-custom-input {
+      width: 68px;
+      background: rgba(9, 13, 22, 0.9);
+      border: 1px solid var(--purple);
+      border-radius: 8px;
+      color: #f3e8ff;
+      font-size: 1.05rem;
+      font-weight: 800;
+      text-align: center;
+      padding: 4px 2px;
+      outline: none;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .bing-hero-result {
+      text-align: right;
+    }
+
+    .bing-hero-score {
+      font-size: clamp(1.5rem, 3.2dvh, 1.85rem);
+      font-weight: 900;
+      color: var(--purple);
+      line-height: 1;
+      text-shadow: 0 0 14px rgba(192, 132, 252, 0.4);
     }
 
     .bing-grid {
@@ -483,9 +569,9 @@
 
     .bing-card {
       background: rgba(13, 19, 33, 0.88);
-      border: 1px solid rgba(192, 132, 252, 0.22);
+      border: 1px solid rgba(192, 132, 252, 0.2);
       border-radius: 9px;
-      padding: clamp(4px, 0.7dvh, 7px) 4px;
+      padding: 5px 4px;
       text-align: center;
       cursor: pointer;
     }
@@ -496,11 +582,11 @@
       box-shadow: 0 0 10px rgba(192, 132, 252, 0.25);
     }
 
-    .bing-title { font-size: clamp(0.6rem, 2.2vw, 0.66rem); color: #d8b4fe; font-weight: 600; }
-    .bing-val { font-size: clamp(1.1rem, 2.3dvh, 1.25rem); font-weight: 800; color: var(--text-main); line-height: 1.15; margin: 1px 0; }
+    .bing-title { font-size: 0.62rem; color: #d8b4fe; font-weight: 600; }
+    .bing-val { font-size: 1.15rem; font-weight: 800; color: var(--text-main); line-height: 1.15; margin: 1px 0; }
     .bing-card.selected .bing-val { color: var(--purple); }
 
-    /* ================= 總分預估與個人尾局反推專屬樣式 ================= */
+    /* ================= 總分預估專屬樣式 ================= */
     .est-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -519,7 +605,7 @@
     }
 
     .est-box-title {
-      font-size: 0.66rem;
+      font-size: 0.65rem;
       color: var(--text-muted);
       display: flex;
       justify-content: space-between;
@@ -537,7 +623,7 @@
       background: transparent;
       border: none;
       text-align: center;
-      font-size: 1.35rem;
+      font-size: 1.3rem;
       font-weight: 900;
       color: var(--text-main);
       outline: none;
@@ -569,7 +655,7 @@
     .rank-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: clamp(0.68rem, 2.5vw, 0.75rem);
+      font-size: clamp(0.68rem, 2.5vw, 0.74rem);
       text-align: center;
       border-radius: 8px;
       overflow: hidden;
@@ -578,7 +664,7 @@
     .rank-table th {
       background: rgba(9, 13, 22, 0.9);
       padding: 5px 2px;
-      font-size: 0.68rem;
+      font-size: 0.66rem;
       border-bottom: 1px solid var(--border-glass);
     }
 
@@ -672,7 +758,7 @@
       </div>
     </div>
 
-    <!-- ==================== 分頁 2：單局標會試算儀 (自適應緊湊版) ==================== -->
+    <!-- ==================== 分頁 2：單局標會試算儀 ==================== -->
     <div id="tabBiao" class="tab-view">
       <div class="top-bar">
         <h1>🏆 單局標會試算</h1>
@@ -683,6 +769,7 @@
         </div>
       </div>
 
+      <!-- 單局甲標 -->
       <div class="hero-card">
         <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--gold); font-weight:700;">
           <span>👑 單局甲標 (最高分)</span>
@@ -707,6 +794,7 @@
         </div>
       </div>
 
+      <!-- 單局乙標籤筒設定 -->
       <div class="generator-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span style="font-size:0.76rem; font-weight:800; color:var(--primary);">🎯 單局乙標籤筒設定</span>
@@ -720,7 +808,7 @@
           </div>
           <div class="slider-row">
             <button class="step-btn" style="width:26px;height:22px;font-size:0.72rem;" onclick="stepStartRate(-0.01)">-</button>
-            <input type="range" id="startRateSlider" class="gold-slider" min="0.50" max="0.90" step="0.01" value="0.84" oninput="onGenChange()">
+            <input type="range" id="startRateSlider" class="gold-slider" min="0.50" max="0.95" step="0.01" value="0.84" oninput="onGenChange()">
             <button class="step-btn" style="width:26px;height:22px;font-size:0.72rem;" onclick="stepStartRate(0.01)">+</button>
           </div>
         </div>
@@ -735,22 +823,26 @@
           </div>
         </div>
 
-        <!-- 自動換行滿版籤數按鈕，不截斷 -->
+        <!-- 擴充版總籤數：支援手動輸入 + 1~25支豐富快選 -->
         <div class="ctrl-box">
           <div class="ctrl-head">
-            <span class="gen-label">③ 總籤數</span>
-            <span style="color:var(--primary); font-weight:700; font-size:0.7rem;" id="lotCountLabel">共 8 支籤</span>
+            <span class="gen-label">③ 總籤數 (可點選或手動輸入)</span>
+            <div class="inline-num-box">
+              <button class="step-btn" style="width:22px;height:20px;font-size:0.7rem;" onclick="stepLotCount(-1)">-</button>
+              <input type="number" id="lotCountInput" class="inline-input" value="8" min="1" max="40" oninput="onLotCountInput()">
+              <span style="font-size:0.65rem;color:var(--text-muted);">支</span>
+              <button class="step-btn" style="width:22px;height:20px;font-size:0.7rem;" onclick="stepLotCount(1)">+</button>
+            </div>
           </div>
-          <div class="chips-wrap" id="lotCountChips"></div>
+          <div class="chips-wrap" id="lotCountChips" style="margin-top:2px;"></div>
         </div>
 
-        <!-- 4欄緊湊網格 -->
         <div class="yi-grid" id="yiGrid"></div>
 
         <div class="inspector-box">
           <div class="inspector-top">
             <span style="color:var(--text-muted);">
-              🔍 單支快查 <span class="step-badge" id="quickStepBadge">步進 0.02</span>
+              🔍 乙標單支快查 <span class="step-badge" id="quickStepBadge">步進 0.02</span>
             </span>
             <span>
               <strong style="color:var(--gold);" id="quickRateTxt">0.80 籤</strong> ➔ 
@@ -759,29 +851,57 @@
           </div>
           <div class="slider-row">
             <button class="step-btn" style="width:26px;height:22px;font-size:0.72rem;" onclick="stepQuickInspect(-1)">-</button>
-            <input type="range" id="quickInspectSlider" min="0.50" max="0.90" step="0.02" value="0.80" oninput="updateQuickInspect()">
+            <input type="range" id="quickInspectSlider" min="0.50" max="0.95" step="0.02" value="0.80" oninput="updateQuickInspect()">
             <button class="step-btn" style="width:26px;height:22px;font-size:0.72rem;" onclick="stepQuickInspect(1)">+</button>
           </div>
         </div>
       </div>
 
-      <!-- 單局丙標：現在不用滾動也能直接看到 -->
+      <!-- 單局丙標：全自訂輸入 + 快速點選 + 3模式切換 -->
       <div class="generator-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:0.76rem; font-weight:800; color:var(--purple);">⚡ 單局丙標預測</span>
+          <span style="font-size:0.76rem; font-weight:800; color:var(--purple);">⚡ 單局丙標自訂與快選</span>
           <span style="font-size:0.68rem; color:var(--text-muted);" id="bingBaseHint">基準: 乙標 0.80 (214分)</span>
         </div>
 
-        <div class="seg-group" style="display:grid; grid-template-columns:1fr 1fr;">
-          <button class="seg-btn active" id="bModeMinus" onclick="setBingMode('minus')">乙標扣分 (-10 ~ -35)</button>
-          <button class="seg-btn" id="bModeLot" onclick="setBingMode('lot')">甲標再抽低籤</button>
+        <!-- 3種丙標計算公式切換 -->
+        <div class="seg-group" style="display:grid; grid-template-columns:repeat(3, 1fr);">
+          <button class="seg-btn active-purp" id="bModeMinus" onclick="setBingMode('minus')">乙標 － 固定分</button>
+          <button class="seg-btn" id="bModeYiMult" onclick="setBingMode('yimult')">乙標 × 折數</button>
+          <button class="seg-btn" id="bModeJiaMult" onclick="setBingMode('jiamult')">甲標 × 折數</button>
         </div>
 
+        <!-- 自訂輸入與即時大字結果區 -->
+        <div class="bing-custom-panel">
+          <div class="bing-hero-row">
+            <div>
+              <div style="font-size:0.68rem; color:#e9d5ff; font-weight:700;" id="bingCustomLabel">自訂：由乙標扣除分數</div>
+              <div class="bing-input-group" style="margin-top:4px;">
+                <button class="step-btn" onclick="stepSingleBingParam(-1)">-</button>
+                <input type="number" id="singleBingInput" class="bing-custom-input" value="15" step="1" oninput="onSingleBingInput()">
+                <button class="step-btn" onclick="stepSingleBingParam(1)">+</button>
+                <span style="font-size:0.72rem; color:var(--text-muted);" id="bingUnitTxt">分</span>
+              </div>
+            </div>
+            <div class="bing-hero-result">
+              <div style="font-size:0.65rem; color:var(--text-muted);" id="bingFormulaDetail">214 - 15 =</div>
+              <div class="bing-hero-score" id="bingHeroScore">199 <span style="font-size:0.8rem;">分</span></div>
+            </div>
+          </div>
+
+          <!-- 常用數值一鍵快選膠囊 -->
+          <div>
+            <div style="font-size:0.62rem; color:var(--text-muted); margin-bottom:3px;">常用規則快速點選：</div>
+            <div class="chips-wrap" id="singleBingQuickChips"></div>
+          </div>
+        </div>
+
+        <!-- 鄰近參考矩陣 -->
         <div class="bing-grid" id="bingGrid"></div>
       </div>
     </div>
 
-    <!-- ==================== 分頁 3：總分標會 (前N局預估最後一局 + 個人控分反推) ==================== -->
+    <!-- ==================== 分頁 3：總分標會 (前N局預估最後一局 + 自訂丙1) ==================== -->
     <div id="tabTotal" class="tab-view">
       <div class="top-bar">
         <h1>📊 總分尾局預估</h1>
@@ -795,19 +915,18 @@
       <!-- 賽前尾局預估甲1核心面板 -->
       <div class="hero-card emerald-theme">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-          <span style="font-size:0.74rem; color:var(--emerald); font-weight:800;" id="tModeTitle">👑 領先者戰況 (已打4局 + 預估第5局)</span>
+          <span style="font-size:0.74rem; color:var(--emerald); font-weight:800;" id="tModeTitle">👑 5局制 (已打4局 + 預估第5局)</span>
           <div class="seg-group">
             <button class="seg-btn active" id="estModePre" onclick="setEstMode('pre')">尾局前預估</button>
             <button class="seg-btn" id="estModeDone" onclick="setEstMode('done')">完賽總分</button>
           </div>
         </div>
 
-        <!-- 模式 A：打最後一局前的「前N局 + 預估尾局」雙欄輸入 -->
         <div id="preEstPanel">
           <div class="est-grid">
             <div class="est-box">
               <div class="est-box-title">
-                <span id="prevGamesLabel">領先者前 4 局總分</span>
+                <span id="prevGamesLabel">領先者前 4 局</span>
                 <span style="color:var(--emerald);" id="prevAvgTxt">均225</span>
               </div>
               <div class="mini-num-ctrl">
@@ -819,7 +938,7 @@
 
             <div class="est-box">
               <div class="est-box-title">
-                <span id="lastGameLabel">預估他第 5 局打</span>
+                <span id="lastGameLabel">預估他第 5 局</span>
                 <span style="color:var(--gold);">尾局劇本</span>
               </div>
               <div class="mini-num-ctrl">
@@ -830,7 +949,6 @@
             </div>
           </div>
 
-          <!-- 領先者最後一局劇本快選 -->
           <div class="chips-wrap" style="margin-top:5px;">
             <button class="chip" onclick="setLastScenario('avg')">照均分打</button>
             <button class="chip" onclick="setLastScenario(190)">失常 190</button>
@@ -841,7 +959,6 @@
           </div>
         </div>
 
-        <!-- 模式 B：已經打完的最終甲1總分輸入 -->
         <div id="doneEstPanel" style="display:none;">
           <div class="jia-main">
             <button class="step-btn" onclick="stepDirectTotal(-20)">-20</button>
@@ -852,7 +969,6 @@
           </div>
         </div>
 
-        <!-- 最終推算出的預估甲1總分橫幅 -->
         <div class="proj-banner">
           <div>
             <div style="font-size:0.65rem; color:var(--text-muted);">預估最終【總分甲1】基準</div>
@@ -861,11 +977,10 @@
           <div style="font-size:1.65rem; font-weight:900; color:var(--gold);" id="projTotalDisplay">1125</div>
         </div>
 
-        <!-- 個人前 N 局分數輸入：自動反推自己最後一局要打幾分才能中乙1/丙1 -->
         <div class="my-score-bar" style="margin-top:6px;">
           <div style="font-size:0.72rem;">
             <span style="color:var(--gold); font-weight:800;">🎯 我目前前 <span id="myPrevGamesNum">4</span> 局總分：</span>
-            <div style="font-size:0.62rem; color:var(--text-muted);">輸入後下方自動顯示「尾局需打幾分」</div>
+            <div style="font-size:0.62rem; color:var(--text-muted);">自動反推「尾局需打幾分」</div>
           </div>
           <div style="display:flex; align-items:center; gap:4px;">
             <button class="step-btn" style="width:26px;height:26px;" onclick="stepMyPrev(-10)">-10</button>
@@ -875,28 +990,44 @@
         </div>
       </div>
 
-      <!-- 總分乙1 籤筒產生器 -->
+      <!-- 總分乙1 籤筒產生器 (擴充籤數與自訂輸入) -->
       <div class="generator-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:0.76rem; font-weight:800; color:var(--primary);">🎯 預估【總分乙1】落點與尾局目標</span>
+          <span style="font-size:0.76rem; font-weight:800; color:var(--primary);">🎯 預估【總分乙1】籤筒設定</span>
           <span style="font-size:0.68rem; color:var(--text-muted);" id="totalYiSummary">區間: 833~945</span>
         </div>
 
         <div class="gen-row">
-          <span class="gen-label">最高籤 <strong style="color:var(--gold);" id="tStartRateVal">0.84</strong></span>
-          <div class="slider-row" style="flex:1; max-width:140px;">
-            <button class="step-btn" style="width:22px;height:20px;font-size:0.68rem;" onclick="stepTStartRate(-0.01)">-</button>
-            <input type="range" id="tStartRateSlider" class="emerald-slider" min="0.50" max="0.90" step="0.01" value="0.84" oninput="onTGenChange()">
-            <button class="step-btn" style="width:22px;height:20px;font-size:0.68rem;" onclick="stepTStartRate(0.01)">+</button>
+          <span class="gen-label">① 最高籤 <strong style="color:var(--gold);" id="tStartRateVal">0.84</strong></span>
+          <div class="slider-row" style="flex:1;">
+            <button class="step-btn" style="width:24px;height:22px;font-size:0.7rem;" onclick="stepTStartRate(-0.01)">-</button>
+            <input type="range" id="tStartRateSlider" class="emerald-slider" min="0.50" max="0.95" step="0.01" value="0.84" oninput="onTGenChange()">
+            <button class="step-btn" style="width:24px;height:22px;font-size:0.7rem;" onclick="stepTStartRate(0.01)">+</button>
           </div>
+        </div>
+
+        <div class="gen-row">
+          <span class="gen-label">② 籤差</span>
           <div class="seg-group">
-            <button class="seg-btn" id="tStep001" onclick="setTLotStep(0.01)">0.01</button>
-            <button class="seg-btn active" id="tStep002" onclick="setTLotStep(0.02)">0.02</button>
+            <button class="seg-btn" id="tStep001" onclick="setTLotStep(0.01)">0.01(連號)</button>
+            <button class="seg-btn active" id="tStep002" onclick="setTLotStep(0.02)">0.02(跳號)</button>
+            <button class="seg-btn" id="tStep003" onclick="setTLotStep(0.03)">0.03</button>
             <button class="seg-btn" id="tStep005" onclick="setTLotStep(0.05)">0.05</button>
           </div>
         </div>
 
-        <div class="chips-wrap" id="tLotCountChips"></div>
+        <div class="ctrl-box">
+          <div class="ctrl-head">
+            <span class="gen-label">③ 總籤數 (可點選或輸入)</span>
+            <div class="inline-num-box">
+              <button class="step-btn" style="width:22px;height:20px;font-size:0.7rem;" onclick="stepTLotCount(-1)">-</button>
+              <input type="number" id="tLotCountInput" class="inline-input" value="8" min="1" max="40" oninput="onTLotCountInput()">
+              <span style="font-size:0.65rem;color:var(--text-muted);">支</span>
+              <button class="step-btn" style="width:22px;height:20px;font-size:0.7rem;" onclick="stepTLotCount(1)">+</button>
+            </div>
+          </div>
+          <div class="chips-wrap" id="tLotCountChips" style="margin-top:2px;"></div>
+        </div>
 
         <div class="yi-grid" id="totalYiGrid"></div>
 
@@ -912,23 +1043,48 @@
           </div>
           <div class="slider-row">
             <button class="step-btn" style="width:26px;height:22px;font-size:0.72rem;" onclick="stepTQuickInspect(-1)">-</button>
-            <input type="range" id="tQuickSlider" min="0.50" max="0.90" step="0.02" value="0.80" oninput="updateTQuickInspect()">
+            <input type="range" id="tQuickSlider" min="0.50" max="0.95" step="0.02" value="0.80" oninput="updateTQuickInspect()">
             <button class="step-btn" style="width:26px;height:22px;font-size:0.72rem;" onclick="stepTQuickInspect(1)">+</button>
           </div>
         </div>
       </div>
 
-      <!-- 總分丙1 試算 -->
+      <!-- 總分丙1 自訂輸入與快選 -->
       <div class="generator-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:0.76rem; font-weight:800; color:var(--purple);">⚡ 預估【總分丙1】與尾局目標</span>
+          <span style="font-size:0.76rem; font-weight:800; color:var(--purple);">⚡ 預估【總分丙1】自訂與快選</span>
           <span style="font-size:0.68rem; color:var(--text-muted);" id="totalBingHint">基準: 乙1=900分</span>
         </div>
 
         <div class="seg-group" style="display:grid; grid-template-columns:repeat(3, 1fr);">
-          <button class="seg-btn active" id="tbModeMult" onclick="setTBingMode('mult')">乙1 × 折數</button>
-          <button class="seg-btn" id="tbModeMinus" onclick="setTBingMode('minus')">乙1 - 扣分</button>
-          <button class="seg-btn" id="tbModeJiaLot" onclick="setTBingMode('jialot')">甲1再抽籤</button>
+          <button class="seg-btn active-purp" id="tbModeMult" onclick="setTBingMode('mult')">乙1 × 折數</button>
+          <button class="seg-btn" id="tbModeMinus" onclick="setTBingMode('minus')">乙1 － 固定分</button>
+          <button class="seg-btn" id="tbModeJiaLot" onclick="setTBingMode('jialot')">甲1 × 折數</button>
+        </div>
+
+        <!-- 總分丙1 自訂輸入框 + 即時大結果 -->
+        <div class="bing-custom-panel">
+          <div class="bing-hero-row">
+            <div>
+              <div style="font-size:0.68rem; color:#e9d5ff; font-weight:700;" id="tBingCustomLabel">自訂：乙1 × 固定折數</div>
+              <div class="bing-input-group" style="margin-top:4px;">
+                <button class="step-btn" onclick="stepTotalBingParam(-1)">-</button>
+                <input type="number" id="totalBingInput" class="bing-custom-input" value="0.88" step="0.01" oninput="onTotalBingInput()">
+                <button class="step-btn" onclick="stepTotalBingParam(1)">+</button>
+                <span style="font-size:0.72rem; color:var(--text-muted);" id="tBingUnitTxt">折</span>
+              </div>
+            </div>
+            <div class="bing-hero-result">
+              <div style="font-size:0.65rem; color:var(--text-muted);" id="tBingFormulaDetail">900 × 0.88 =</div>
+              <div class="bing-hero-score" id="tBingHeroScore">792 <span style="font-size:0.75rem;">分</span></div>
+              <div class="need-tag" id="tBingHeroNeed">尾局打 92</div>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:0.62rem; color:var(--text-muted); margin-bottom:3px;">常用規則快速點選：</div>
+            <div class="chips-wrap" id="totalBingQuickChips"></div>
+          </div>
         </div>
 
         <div class="bing-grid" id="totalBingGrid"></div>
@@ -993,17 +1149,18 @@
       else renderTotal();
     }
 
-    const LOT_COUNT_OPTIONS = [4, 5, 6, 7, 8, 9, 10, 12];
+    // 大幅擴充的乙標預設總籤數選項 (1支 ~ 25支)
+    const LOT_COUNT_OPTIONS = [3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25];
 
     function syncInspectorSlider(sliderId, badgeId, topStartRate, stepSize, currentSelRate) {
       const slider = document.getElementById(sliderId);
       const badge = document.getElementById(badgeId);
       badge.innerText = `步進 ${stepSize.toFixed(2)}`;
 
-      const stepsDown = Math.floor((topStartRate - 0.50 + 1e-9) / stepSize);
+      const stepsDown = Math.floor((topStartRate - 0.40 + 1e-9) / stepSize);
       const alignedMin = Math.round((topStartRate - stepsDown * stepSize) * 100) / 100;
 
-      const stepsUp = Math.floor((0.90 - topStartRate + 1e-9) / stepSize);
+      const stepsUp = Math.floor((0.95 - topStartRate + 1e-9) / stepSize);
       const alignedMax = Math.round((topStartRate + stepsUp * stepSize) * 100) / 100;
 
       slider.min = alignedMin.toFixed(2);
@@ -1181,9 +1338,14 @@
     let roundMode = 'round';
     let startRate = 0.84;
     let lotStep = 0.02;
-    let lotCount = 8; // 預設8支剛好2排4欄
+    let lotCount = 8;
     let selectedYiRate = 0.80;
-    let bingMode = 'minus';
+
+    // 單局丙標自訂狀態
+    let bingMode = 'minus';         // 'minus' (乙標扣分) | 'yimult' (乙標×折數) | 'jiamult' (甲標×折數)
+    let singleBingMinusVal = 15;    // 自訂乙標扣分預設 15
+    let singleBingYiMultVal = 0.85; // 自訂乙標乘折數預設 0.85
+    let singleBingJiaMultVal = 0.72;// 自訂甲標乘折數預設 0.72
 
     function applyRound(val) {
       if (roundMode === 'floor') return Math.floor(val + 1e-9);
@@ -1215,7 +1377,7 @@
     }
 
     function stepStartRate(delta) {
-      startRate = Math.max(0.50, Math.min(0.90, Math.round((startRate + delta) * 100) / 100));
+      startRate = Math.max(0.50, Math.min(0.95, Math.round((startRate + delta) * 100) / 100));
       document.getElementById('startRateSlider').value = startRate.toFixed(2);
       onGenChange();
     }
@@ -1238,8 +1400,21 @@
     }
 
     function setLotCount(cnt) {
-      lotCount = cnt;
+      lotCount = Math.max(1, Math.min(40, cnt));
+      document.getElementById('lotCountInput').value = lotCount;
       renderBiao();
+    }
+
+    function stepLotCount(delta) {
+      setLotCount(lotCount + delta);
+    }
+
+    function onLotCountInput() {
+      const v = parseInt(document.getElementById('lotCountInput').value, 10);
+      if (!isNaN(v) && v >= 1) {
+        lotCount = Math.min(40, v);
+        renderBiao();
+      }
     }
 
     function selectYi(rate) {
@@ -1263,15 +1438,64 @@
       renderBiao();
     }
 
+    // 單局丙標模式與自訂參數操作
     function setBingMode(mode) {
       bingMode = mode;
-      document.getElementById('bModeMinus').classList.toggle('active', mode === 'minus');
-      document.getElementById('bModeLot').classList.toggle('active', mode === 'lot');
+      document.getElementById('bModeMinus').className = 'seg-btn ' + (mode === 'minus' ? 'active-purp' : '');
+      document.getElementById('bModeYiMult').className = 'seg-btn ' + (mode === 'yimult' ? 'active-purp' : '');
+      document.getElementById('bModeJiaMult').className = 'seg-btn ' + (mode === 'jiamult' ? 'active-purp' : '');
+
+      const inp = document.getElementById('singleBingInput');
+      if (mode === 'minus') {
+        inp.step = '1';
+        inp.value = singleBingMinusVal;
+      } else if (mode === 'yimult') {
+        inp.step = '0.01';
+        inp.value = singleBingYiMultVal.toFixed(2);
+      } else {
+        inp.step = '0.01';
+        inp.value = singleBingJiaMultVal.toFixed(2);
+      }
       renderBiao();
     }
 
+    function setSingleBingParam(val) {
+      const inp = document.getElementById('singleBingInput');
+      if (bingMode === 'minus') {
+        singleBingMinusVal = Math.max(0, Math.round(val));
+        inp.value = singleBingMinusVal;
+      } else if (bingMode === 'yimult') {
+        singleBingYiMultVal = Math.max(0.30, Math.min(0.99, Math.round(val * 100) / 100));
+        inp.value = singleBingYiMultVal.toFixed(2);
+      } else {
+        singleBingJiaMultVal = Math.max(0.30, Math.min(0.99, Math.round(val * 100) / 100));
+        inp.value = singleBingJiaMultVal.toFixed(2);
+      }
+      renderBiao();
+    }
+
+    function stepSingleBingParam(dir) {
+      if (bingMode === 'minus') {
+        setSingleBingParam(singleBingMinusVal + dir * 1);
+      } else if (bingMode === 'yimult') {
+        setSingleBingParam(singleBingYiMultVal + dir * 0.01);
+      } else {
+        setSingleBingParam(singleBingJiaMultVal + dir * 0.01);
+      }
+    }
+
+    function onSingleBingInput() {
+      const v = parseFloat(document.getElementById('singleBingInput').value);
+      if (!isNaN(v)) {
+        if (bingMode === 'minus') singleBingMinusVal = Math.max(0, v);
+        else if (bingMode === 'yimult') singleBingYiMultVal = Math.max(0.1, Math.min(0.99, v));
+        else singleBingJiaMultVal = Math.max(0.1, Math.min(0.99, v));
+        renderBiao();
+      }
+    }
+
     function renderBiao() {
-      document.getElementById('lotCountLabel').innerText = `共 ${lotCount} 支籤`;
+      // 渲染 3~25 支籤快選膠囊
       let cntHtml = '';
       LOT_COUNT_OPTIONS.forEach(c => {
         cntHtml += `<button class="chip ${c === lotCount ? 'active' : ''}" onclick="setLotCount(${c})">${c}支</button>`;
@@ -1283,12 +1507,12 @@
       const rates = [];
       for (let i = 0; i < lotCount; i++) {
         const r = Math.round((startRate - i * lotStep) * 100) / 100;
-        if (r >= 0.35) rates.push(r);
+        if (r >= 0.30) rates.push(r);
       }
 
       const maxScore = applyRound(jiaScore * rates[0]);
       const minScore = applyRound(jiaScore * rates[rates.length - 1]);
-      document.getElementById('poolRangeSummary').innerText = `本筒: ${minScore} ~ ${maxScore} 分`;
+      document.getElementById('poolRangeSummary').innerText = `本筒(${rates.length}支): ${minScore} ~ ${maxScore} 分`;
 
       let yiHtml = '';
       rates.forEach(r => {
@@ -1308,59 +1532,99 @@
       document.getElementById('quickRateTxt').innerText = selectedYiRate.toFixed(2) + ' 籤';
       document.getElementById('quickScoreTxt').innerText = applyRound(jiaScore * selectedYiRate) + ' 分';
 
+      // 渲染單局丙標自訂區與快選
       const baseYiScore = applyRound(jiaScore * selectedYiRate);
-      let bingHtml = '';
+      document.getElementById('bingBaseHint').innerText = `基準: 乙標 ${selectedYiRate.toFixed(2)} (${baseYiScore}分)`;
+
+      let heroBingScore = 0;
+      let quickPresets = [];
+      let gridCards = [];
 
       if (bingMode === 'minus') {
-        document.getElementById('bingBaseHint').innerText = `基準: 乙標 ${selectedYiRate.toFixed(2)} (${baseYiScore}分)`;
-        [10, 15, 20, 25, 30, 35].forEach(diff => {
-          bingHtml += `
-            <div class="bing-card">
-              <div class="bing-title">乙標 - ${diff}</div>
-              <div class="bing-val">${Math.max(0, baseYiScore - diff)}</div>
-              <div class="lot-exact">基數 ${baseYiScore}</div>
-            </div>
-          `;
+        document.getElementById('bingCustomLabel').innerText = '自訂：由乙標扣除固定分數';
+        document.getElementById('bingUnitTxt').innerText = '分';
+        heroBingScore = Math.max(0, Math.round(baseYiScore - singleBingMinusVal));
+        document.getElementById('bingFormulaDetail').innerText = `乙標 ${baseYiScore} - ${singleBingMinusVal} =`;
+
+        quickPresets = [5, 8, 10, 12, 15, 18, 20, 25, 30, 35];
+        [10, 15, 20, 25, 30, 35].forEach(d => {
+          gridCards.push({ val: d, title: `乙標 - ${d}`, score: Math.max(0, baseYiScore - d), sub: `基數 ${baseYiScore}`, active: Math.abs(d - singleBingMinusVal) < 0.1 });
+        });
+      } else if (bingMode === 'yimult') {
+        document.getElementById('bingCustomLabel').innerText = '自訂：由乙標 × 固定折數';
+        document.getElementById('bingUnitTxt').innerText = '折';
+        const exact = baseYiScore * singleBingYiMultVal;
+        heroBingScore = applyRound(exact);
+        document.getElementById('bingFormulaDetail').innerText = `乙標 ${baseYiScore} × ${singleBingYiMultVal.toFixed(2)} (${exact.toFixed(1)}) =`;
+
+        quickPresets = [0.95, 0.92, 0.90, 0.88, 0.85, 0.82, 0.80, 0.78, 0.75];
+        [0.92, 0.90, 0.88, 0.85, 0.82, 0.80].forEach(m => {
+          const ex = baseYiScore * m;
+          gridCards.push({ val: m, title: `乙標 × ${m.toFixed(2)}`, score: applyRound(ex), sub: `實算 ${ex.toFixed(1)}`, active: Math.abs(m - singleBingYiMultVal) < 0.005 });
         });
       } else {
-        document.getElementById('bingBaseHint').innerText = `基準: 比乙標(${selectedYiRate.toFixed(2)})再低之籤`;
+        document.getElementById('bingCustomLabel').innerText = '自訂：由甲標直接 × 丙標籤號';
+        document.getElementById('bingUnitTxt').innerText = '籤';
+        const exact = jiaScore * singleBingJiaMultVal;
+        heroBingScore = applyRound(exact);
+        document.getElementById('bingFormulaDetail').innerText = `甲標 ${jiaScore} × ${singleBingJiaMultVal.toFixed(2)} (${exact.toFixed(1)}) =`;
+
+        quickPresets = [0.78, 0.76, 0.75, 0.74, 0.72, 0.70, 0.68, 0.66, 0.65, 0.60];
         [1, 2, 3, 4, 5, 6].forEach(mult => {
-          const drop = mult * lotStep;
-          const bRate = Math.max(0.35, Math.round((selectedYiRate - drop) * 100) / 100);
-          const exact = jiaScore * bRate;
-          bingHtml += `
-            <div class="bing-card">
-              <div class="bing-title">${bRate.toFixed(2)}籤</div>
-              <div class="bing-val">${applyRound(exact)}</div>
-              <div class="lot-exact">${exact.toFixed(1)}</div>
-            </div>
-          `;
+          const br = Math.max(0.35, Math.round((selectedYiRate - mult * lotStep) * 100) / 100);
+          const ex = jiaScore * br;
+          gridCards.push({ val: br, title: `甲標 × ${br.toFixed(2)}`, score: applyRound(ex), sub: `實算 ${ex.toFixed(1)}`, active: Math.abs(br - singleBingJiaMultVal) < 0.005 });
         });
       }
+
+      document.getElementById('bingHeroScore').innerHTML = `${heroBingScore} <span style="font-size:0.8rem;">分</span>`;
+
+      let qChipsHtml = '';
+      quickPresets.forEach(p => {
+        const isAct = (bingMode === 'minus') ? (Math.abs(p - singleBingMinusVal) < 0.1) :
+                      (bingMode === 'yimult' ? (Math.abs(p - singleBingYiMultVal) < 0.005) : (Math.abs(p - singleBingJiaMultVal) < 0.005));
+        const label = (bingMode === 'minus') ? `-${p}分` : `×${p.toFixed(2)}`;
+        qChipsHtml += `<button class="chip ${isAct ? 'active-purp' : ''}" onclick="setSingleBingParam(${p})">${label}</button>`;
+      });
+      document.getElementById('singleBingQuickChips').innerHTML = qChipsHtml;
+
+      let bingHtml = '';
+      gridCards.forEach(c => {
+        bingHtml += `
+          <div class="bing-card ${c.active ? 'selected' : ''}" onclick="setSingleBingParam(${c.val})">
+            <div class="bing-title">${c.title}</div>
+            <div class="bing-val">${c.score}</div>
+            <div class="lot-exact">${c.sub}</div>
+          </div>
+        `;
+      });
       document.getElementById('bingGrid').innerHTML = bingHtml;
     }
 
-    /* ================= 分頁 3：總分尾局預估與控分反推邏輯 ================= */
-    let totalGames = 5;       // 預設 5 局制 (打完 4 局預估第 5 局)
-    let estMode = 'pre';      // 'pre' (尾局前預估) | 'done' (已完賽總分)
-    let leaderPrevSum = 900;  // 領先者前 N-1 局總分 (如 4 局 900 分)
-    let leaderLastEst = 225;  // 預估領先者最後一局分數
-    let directTotalJia = 1125;// 若選完賽總分模式的甲1總分
-    let myPrevSum = 700;      // 使用者自己前 N-1 局的總分
+    /* ================= 分頁 3：總分尾局預估與自訂丙1邏輯 ================= */
+    let totalGames = 5;
+    let estMode = 'pre';
+    let leaderPrevSum = 900;
+    let leaderLastEst = 225;
+    let directTotalJia = 1125;
+    let myPrevSum = 700;
 
     let tStartRate = 0.84;
     let tLotStep = 0.02;
     let tLotCount = 8;
     let tSelectedYiRate = 0.80;
-    let tBingMode = 'mult';
-    let tSelectedBingIdx = 1;
+
+    // 總分丙1自訂狀態
+    let tBingMode = 'mult';          // 'mult' (乙1×折數) | 'minus' (乙1-固定分) | 'jialot' (甲1×折數)
+    let tBingMultVal = 0.88;         // 自訂乙1乘折數預設 0.88
+    let tBingMinusVal = 60;          // 自訂乙1扣分預設 60
+    let tBingJiaLotVal = 0.72;       // 自訂甲1乘折數預設 0.72
     let rankGap = 3;
 
     function getProjectedJia() {
       return estMode === 'pre' ? (leaderPrevSum + leaderLastEst) : directTotalJia;
     }
 
-    // 計算「我最後一局需要打幾分」的輔助標籤
     function getNeedBadgeHtml(targetTotal) {
       if (estMode !== 'pre') {
         return `<div class="lot-exact">均 ${(targetTotal / totalGames).toFixed(1)}</div>`;
@@ -1434,11 +1698,7 @@
 
     function setLastScenario(val) {
       const prevG = totalGames - 1;
-      if (val === 'avg') {
-        leaderLastEst = Math.round(leaderPrevSum / prevG);
-      } else {
-        leaderLastEst = val;
-      }
+      leaderLastEst = (val === 'avg') ? Math.round(leaderPrevSum / prevG) : val;
       document.getElementById('leaderLastInput').value = leaderLastEst;
       renderTotal();
     }
@@ -1466,7 +1726,7 @@
     }
 
     function stepTStartRate(delta) {
-      tStartRate = Math.max(0.50, Math.min(0.90, Math.round((tStartRate + delta) * 100) / 100));
+      tStartRate = Math.max(0.50, Math.min(0.95, Math.round((tStartRate + delta) * 100) / 100));
       document.getElementById('tStartRateSlider').value = tStartRate.toFixed(2);
       onTGenChange();
     }
@@ -1482,14 +1742,28 @@
       tLotStep = step;
       document.getElementById('tStep001').classList.toggle('active', step === 0.01);
       document.getElementById('tStep002').classList.toggle('active', step === 0.02);
+      document.getElementById('tStep003').classList.toggle('active', step === 0.03);
       document.getElementById('tStep005').classList.toggle('active', step === 0.05);
       tSelectedYiRate = syncInspectorSlider('tQuickSlider', 'tQuickStepBadge', tStartRate, tLotStep, tSelectedYiRate);
       renderTotal();
     }
 
     function setTLotCount(cnt) {
-      tLotCount = cnt;
+      tLotCount = Math.max(1, Math.min(40, cnt));
+      document.getElementById('tLotCountInput').value = tLotCount;
       renderTotal();
+    }
+
+    function stepTLotCount(delta) {
+      setTLotCount(tLotCount + delta);
+    }
+
+    function onTLotCountInput() {
+      const v = parseInt(document.getElementById('tLotCountInput').value, 10);
+      if (!isNaN(v) && v >= 1) {
+        tLotCount = Math.min(40, v);
+        renderTotal();
+      }
     }
 
     function selectTYi(rate) {
@@ -1513,17 +1787,60 @@
       renderTotal();
     }
 
+    // 總分丙1 自訂控制
     function setTBingMode(mode) {
       tBingMode = mode;
-      document.getElementById('tbModeMult').classList.toggle('active', mode === 'mult');
-      document.getElementById('tbModeMinus').classList.toggle('active', mode === 'minus');
-      document.getElementById('tbModeJiaLot').classList.toggle('active', mode === 'jialot');
+      document.getElementById('tbModeMult').className = 'seg-btn ' + (mode === 'mult' ? 'active-purp' : '');
+      document.getElementById('tbModeMinus').className = 'seg-btn ' + (mode === 'minus' ? 'active-purp' : '');
+      document.getElementById('tbModeJiaLot').className = 'seg-btn ' + (mode === 'jialot' ? 'active-purp' : '');
+
+      const inp = document.getElementById('totalBingInput');
+      if (mode === 'minus') {
+        inp.step = '5';
+        inp.value = tBingMinusVal;
+      } else if (mode === 'mult') {
+        inp.step = '0.01';
+        inp.value = tBingMultVal.toFixed(2);
+      } else {
+        inp.step = '0.01';
+        inp.value = tBingJiaLotVal.toFixed(2);
+      }
       renderTotal();
     }
 
-    function selectTBingCard(idx) {
-      tSelectedBingIdx = idx;
+    function setTotalBingParam(val) {
+      const inp = document.getElementById('totalBingInput');
+      if (tBingMode === 'minus') {
+        tBingMinusVal = Math.max(0, Math.round(val));
+        inp.value = tBingMinusVal;
+      } else if (tBingMode === 'mult') {
+        tBingMultVal = Math.max(0.30, Math.min(0.99, Math.round(val * 100) / 100));
+        inp.value = tBingMultVal.toFixed(2);
+      } else {
+        tBingJiaLotVal = Math.max(0.30, Math.min(0.99, Math.round(val * 100) / 100));
+        inp.value = tBingJiaLotVal.toFixed(2);
+      }
       renderTotal();
+    }
+
+    function stepTotalBingParam(dir) {
+      if (tBingMode === 'minus') {
+        setTotalBingParam(tBingMinusVal + dir * 5);
+      } else if (tBingMode === 'mult') {
+        setTotalBingParam(tBingMultVal + dir * 0.01);
+      } else {
+        setTotalBingParam(tBingJiaLotVal + dir * 0.01);
+      }
+    }
+
+    function onTotalBingInput() {
+      const v = parseFloat(document.getElementById('totalBingInput').value);
+      if (!isNaN(v)) {
+        if (tBingMode === 'minus') tBingMinusVal = Math.max(0, v);
+        else if (tBingMode === 'mult') tBingMultVal = Math.max(0.1, Math.min(0.99, v));
+        else tBingJiaLotVal = Math.max(0.1, Math.min(0.99, v));
+        renderTotal();
+      }
     }
 
     function setRankGap(gap) {
@@ -1553,7 +1870,7 @@
       }
       document.getElementById('projTotalDisplay').innerText = projJia;
 
-      // 渲染總分籤數選擇
+      // 渲染總分 3~25 支籤快選
       let tCntHtml = '';
       LOT_COUNT_OPTIONS.forEach(c => {
         tCntHtml += `<button class="chip ${c === tLotCount ? 'active-em' : ''}" onclick="setTLotCount(${c})">${c}支</button>`;
@@ -1565,12 +1882,12 @@
       const rates = [];
       for (let i = 0; i < tLotCount; i++) {
         const r = Math.round((tStartRate - i * tLotStep) * 100) / 100;
-        if (r >= 0.35) rates.push(r);
+        if (r >= 0.30) rates.push(r);
       }
 
       const maxYi = applyRound(projJia * rates[0]);
       const minYi = applyRound(projJia * rates[rates.length - 1]);
-      document.getElementById('totalYiSummary').innerText = `本筒乙1: ${minYi} ~ ${maxYi}`;
+      document.getElementById('totalYiSummary').innerText = `本筒(${rates.length}支): ${minYi} ~ ${maxYi}`;
 
       let yiHtml = '';
       rates.forEach(r => {
@@ -1591,45 +1908,76 @@
       document.getElementById('tQuickRateTxt').innerText = tSelectedYiRate.toFixed(2) + ' 籤';
       document.getElementById('tQuickScoreTxt').innerText = `${yi1Score}分 (尾局打${myNeedYi1})`;
 
-      // 渲染丙1
+      // 渲染總分丙1自訂面板與快選
       document.getElementById('totalBingHint').innerText = `基準: 乙1 (${tSelectedYiRate.toFixed(2)}) = ${yi1Score}分`;
-      const bingOptions = [];
+      let bing1Score = 0;
+      let tQuickPresets = [];
+      let tGridCards = [];
 
       if (tBingMode === 'mult') {
+        document.getElementById('tBingCustomLabel').innerText = '自訂：由乙1 × 固定折數';
+        document.getElementById('tBingUnitTxt').innerText = '折';
+        const exact = yi1Score * tBingMultVal;
+        bing1Score = applyRound(exact);
+        document.getElementById('tBingFormulaDetail').innerText = `乙1(${yi1Score}) × ${tBingMultVal.toFixed(2)} =`;
+
+        tQuickPresets = [0.95, 0.92, 0.90, 0.88, 0.86, 0.85, 0.82, 0.80, 0.78, 0.75];
         [0.92, 0.90, 0.88, 0.85, 0.82, 0.80].forEach(m => {
           const sc = applyRound(yi1Score * m);
-          bingOptions.push({ label: `乙1×${m.toFixed(2)}`, score: sc });
+          tGridCards.push({ val: m, label: `乙1 × ${m.toFixed(2)}`, score: sc, active: Math.abs(m - tBingMultVal) < 0.005 });
         });
       } else if (tBingMode === 'minus') {
-        [40, 50, 60, 80, 100, 120].forEach(diff => {
-          const sc = Math.max(0, yi1Score - diff);
-          bingOptions.push({ label: `乙1-${diff}分`, score: sc });
+        document.getElementById('tBingCustomLabel').innerText = '自訂：由乙1 扣除固定總分';
+        document.getElementById('tBingUnitTxt').innerText = '分';
+        bing1Score = Math.max(0, Math.round(yi1Score - tBingMinusVal));
+        document.getElementById('tBingFormulaDetail').innerText = `乙1(${yi1Score}) - ${tBingMinusVal} =`;
+
+        tQuickPresets = [20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 150];
+        [30, 40, 50, 60, 80, 100].forEach(d => {
+          const sc = Math.max(0, yi1Score - d);
+          tGridCards.push({ val: d, label: `乙1 - ${d}分`, score: sc, active: Math.abs(d - tBingMinusVal) < 0.1 });
         });
       } else {
+        document.getElementById('tBingCustomLabel').innerText = '自訂：由甲1直接 × 丙1籤號';
+        document.getElementById('tBingUnitTxt').innerText = '籤';
+        const exact = projJia * tBingJiaLotVal;
+        bing1Score = applyRound(exact);
+        document.getElementById('tBingFormulaDetail').innerText = `甲1(${projJia}) × ${tBingJiaLotVal.toFixed(2)} =`;
+
+        tQuickPresets = [0.78, 0.76, 0.75, 0.74, 0.72, 0.70, 0.68, 0.66, 0.65, 0.60];
         [1, 2, 3, 4, 5, 6].forEach(mult => {
-          const drop = mult * tLotStep;
-          const br = Math.max(0.35, Math.round((tSelectedYiRate - drop) * 100) / 100);
+          const br = Math.max(0.35, Math.round((tSelectedYiRate - mult * tLotStep) * 100) / 100);
           const sc = applyRound(projJia * br);
-          bingOptions.push({ label: `甲1×${br.toFixed(2)}`, score: sc });
+          tGridCards.push({ val: br, label: `甲1 × ${br.toFixed(2)}`, score: sc, active: Math.abs(br - tBingJiaLotVal) < 0.005 });
         });
       }
 
+      document.getElementById('tBingHeroScore').innerHTML = `${bing1Score} <span style="font-size:0.75rem;">分</span>`;
+      const needBing1 = bing1Score - myPrevSum;
+      document.getElementById('tBingHeroNeed').innerText = (estMode === 'pre') ? `🎯 尾局打 ${needBing1} 分` : `平均 ${(bing1Score / totalGames).toFixed(1)}/局`;
+
+      let tqHtml = '';
+      tQuickPresets.forEach(p => {
+        const isAct = (tBingMode === 'minus') ? (Math.abs(p - tBingMinusVal) < 0.1) :
+                      (tBingMode === 'mult' ? (Math.abs(p - tBingMultVal) < 0.005) : (Math.abs(p - tBingJiaLotVal) < 0.005));
+        const label = (tBingMode === 'minus') ? `-${p}分` : `×${p.toFixed(2)}`;
+        tqHtml += `<button class="chip ${isAct ? 'active-purp' : ''}" onclick="setTotalBingParam(${p})">${label}</button>`;
+      });
+      document.getElementById('totalBingQuickChips').innerHTML = tqHtml;
+
       let bingHtml = '';
-      bingOptions.forEach((opt, idx) => {
-        const isSel = (idx === tSelectedBingIdx);
+      tGridCards.forEach(c => {
         bingHtml += `
-          <div class="bing-card ${isSel ? 'selected' : ''}" onclick="selectTBingCard(${idx})">
-            <div class="bing-title">${opt.label}</div>
-            <div class="bing-val">${opt.score}</div>
-            ${getNeedBadgeHtml(opt.score)}
+          <div class="bing-card ${c.active ? 'selected' : ''}" onclick="setTotalBingParam(${c.val})">
+            <div class="bing-title">${c.label}</div>
+            <div class="bing-val">${c.score}</div>
+            ${getNeedBadgeHtml(c.score)}
           </div>
         `;
       });
       document.getElementById('totalBingGrid').innerHTML = bingHtml;
 
-      const bing1Score = bingOptions[tSelectedBingIdx] ? bingOptions[tSelectedBingIdx].score : bingOptions[0].score;
-
-      // 渲染 1~8 名落點與尾局所需分
+      // 渲染 1~8 名落點與尾局所需分 (丙1~8 緊密連動剛才你自訂算出的丙1分數！)
       let tableHtml = '';
       for (let rank = 1; rank <= 8; rank++) {
         const drop = (rank - 1) * rankGap;
