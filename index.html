@@ -17,7 +17,7 @@
   <style>
     :root {
       --bg-deep: #090d16;
-      --bg-card: rgba(20, 28, 46, 0.85);
+      --bg-card: rgba(20, 28, 46, 0.86);
       --border-glass: rgba(255, 255, 255, 0.09);
       --primary: #38bdf8;
       --gold: #fbbf24;
@@ -45,12 +45,12 @@
       background-color: var(--bg-deep);
       background-image: 
         radial-gradient(circle at 15% 10%, rgba(56, 189, 248, 0.1) 0%, transparent 40%),
-        radial-gradient(circle at 85% 20%, rgba(251, 191, 36, 0.1) 0%, transparent 45%);
+        radial-gradient(circle at 85% 20%, rgba(251, 191, 36, 0.1) 0%, transparent 45%),
+        radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.08) 0%, transparent 45%);
       color: var(--text-main);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
     }
 
-    /* 整體架構：上方內容區 + 底部固定導航列 */
     .app-shell {
       width: 100%;
       max-width: 440px;
@@ -61,13 +61,12 @@
       padding-top: calc(env(safe-area-inset-top, 10px) + 4px);
     }
 
-    /* 分頁內容區 */
     .tab-view {
       display: none;
       flex: 1;
       width: 100%;
       overflow-y: auto;
-      padding: 4px 12px 12px;
+      padding: 4px 12px 16px;
       scrollbar-width: none;
     }
     .tab-view::-webkit-scrollbar { display: none; }
@@ -77,27 +76,25 @@
       flex-direction: column;
     }
 
-    /* 分頁 1 (球道瞄準) 鎖定一頁滿版不滾動 */
     #tabAim.active {
       overflow: hidden;
       gap: 6px;
     }
 
-    /* 分頁 2 (週賽標會) 允許優雅微滾動 */
-    #tabBiao.active {
+    #tabBiao.active, #tabTotal.active {
       gap: 10px;
     }
 
-    /* 底部 iOS 原生感導航列 */
+    /* 底部三分頁導航列 */
     .bottom-nav {
       flex-shrink: 0;
-      height: calc(54px + env(safe-area-inset-bottom, 8px));
+      height: calc(56px + env(safe-area-inset-bottom, 8px));
       padding-bottom: env(safe-area-inset-bottom, 8px);
-      background: rgba(13, 19, 33, 0.94);
+      background: rgba(11, 16, 28, 0.95);
       backdrop-filter: blur(16px);
       border-top: 1px solid var(--border-glass);
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       z-index: 50;
     }
 
@@ -110,7 +107,7 @@
       align-items: center;
       justify-content: center;
       gap: 3px;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
@@ -122,15 +119,11 @@
       fill: currentColor;
     }
 
-    .nav-item.active-aim {
-      color: var(--primary);
-    }
+    .nav-item.active-aim { color: var(--primary); }
+    .nav-item.active-biao { color: var(--gold); }
+    .nav-item.active-total { color: var(--emerald); }
 
-    .nav-item.active-biao {
-      color: var(--gold);
-    }
-
-    /* ================= 共用與瞄準器樣式 ================= */
+    /* ================= 共用元件樣式 ================= */
     .top-bar {
       display: flex;
       justify-content: space-between;
@@ -153,26 +146,19 @@
     }
 
     .pill-btn {
-      padding: 4px 9px;
+      padding: 4px 8px;
       border: none;
       background: transparent;
       color: var(--text-muted);
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       font-weight: 600;
       border-radius: 6px;
       cursor: pointer;
     }
 
-    .pill-btn.active {
-      background: var(--primary);
-      color: #090d16;
-    }
-
-    .pill-btn.active-gold {
-      background: rgba(251, 191, 36, 0.2);
-      color: var(--gold);
-      border: 1px solid rgba(251, 191, 36, 0.4);
-    }
+    .pill-btn.active { background: var(--primary); color: #090d16; }
+    .pill-btn.active-gold { background: rgba(251, 191, 36, 0.2); color: var(--gold); border: 1px solid rgba(251, 191, 36, 0.4); }
+    .pill-btn.active-emerald { background: rgba(16, 185, 129, 0.2); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.4); }
 
     /* 瞄準結果卡 */
     .aim-result-card {
@@ -194,7 +180,6 @@
       text-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
     }
 
-    /* 2x2 滑桿網格 */
     .aim-controls {
       background: var(--bg-card);
       border-radius: 12px;
@@ -209,25 +194,23 @@
     .ctrl-box {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 3px;
     }
 
     .ctrl-head {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       font-size: 0.72rem;
       font-weight: 500;
     }
 
-    .val-txt {
-      color: var(--primary);
-      font-weight: 700;
-    }
+    .val-txt { color: var(--primary); font-weight: 700; }
 
     .slider-row {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
     }
 
     .hint-txt {
@@ -249,17 +232,16 @@
     input[type=range]::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 18px;
-      height: 18px;
+      width: 19px;
+      height: 19px;
       border-radius: 50%;
       background: #f8fafc;
       border: 2.5px solid var(--primary);
       cursor: pointer;
     }
 
-    input[type=range].gold-slider::-webkit-slider-thumb {
-      border-color: var(--gold);
-    }
+    input[type=range].gold-slider::-webkit-slider-thumb { border-color: var(--gold); }
+    input[type=range].emerald-slider::-webkit-slider-thumb { border-color: var(--emerald); }
 
     .lane-card {
       background: var(--bg-card);
@@ -301,14 +283,19 @@
       transition: width 0.22s ease;
     }
 
-    /* ================= 分頁 2：週賽標會專屬樣式 ================= */
-    .jia-card {
+    /* ================= 標會與總分卡片樣式 ================= */
+    .hero-card {
       background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
       border: 1px solid rgba(251, 191, 36, 0.35);
       border-radius: 16px;
       padding: 12px 14px;
-      box-shadow: 0 8px 25px -8px rgba(251, 191, 36, 0.2);
+      box-shadow: 0 8px 25px -8px rgba(251, 191, 36, 0.18);
       flex-shrink: 0;
+    }
+
+    .hero-card.emerald-theme {
+      border-color: rgba(16, 185, 129, 0.35);
+      box-shadow: 0 8px 25px -8px rgba(16, 185, 129, 0.18);
     }
 
     .jia-main {
@@ -320,29 +307,35 @@
 
     .step-btn {
       width: 38px;
-      height: 38px;
-      border-radius: 10px;
+      height: 36px;
+      border-radius: 9px;
       border: 1px solid var(--border-glass);
       background: rgba(255, 255, 255, 0.06);
       color: var(--text-main);
-      font-size: 0.95rem;
+      font-size: 0.85rem;
       font-weight: 700;
       cursor: pointer;
+      flex-shrink: 0;
     }
     .step-btn:active { background: rgba(251, 191, 36, 0.25); }
 
-    .jia-input {
-      width: 120px;
+    .big-input {
+      width: 135px;
       background: transparent;
       border: none;
       text-align: center;
-      font-size: 2.7rem;
+      font-size: 2.5rem;
       font-weight: 900;
       color: var(--gold);
-      text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+      text-shadow: 0 0 20px rgba(251, 191, 36, 0.35);
       outline: none;
       user-select: text;
       -webkit-user-select: text;
+    }
+
+    .big-input.emerald-txt {
+      color: var(--emerald);
+      text-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
     }
 
     .chips-row {
@@ -350,17 +343,18 @@
       gap: 5px;
       overflow-x: auto;
       scrollbar-width: none;
+      padding-bottom: 1px;
     }
     .chips-row::-webkit-scrollbar { display: none; }
 
     .chip {
       flex-shrink: 0;
-      padding: 4px 10px;
+      padding: 4px 9px;
       border-radius: 7px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border-glass);
       color: var(--text-muted);
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       font-weight: 600;
       cursor: pointer;
     }
@@ -369,8 +363,12 @@
       color: var(--gold);
       border-color: rgba(251, 191, 36, 0.45);
     }
+    .chip.active-em {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--emerald);
+      border-color: rgba(16, 185, 129, 0.45);
+    }
 
-    /* 籤池產生器設定面板 */
     .generator-card {
       background: var(--bg-card);
       border: 1px solid var(--border-glass);
@@ -378,7 +376,7 @@
       padding: 12px 14px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 9px;
       flex-shrink: 0;
     }
 
@@ -386,11 +384,11 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .gen-label {
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       color: var(--text-muted);
       font-weight: 600;
       flex-shrink: 0;
@@ -398,18 +396,22 @@
 
     .seg-group {
       display: flex;
-      gap: 4px;
+      gap: 3px;
       background: rgba(9, 13, 22, 0.85);
       padding: 3px;
       border-radius: 8px;
       border: 1px solid var(--border-glass);
+      overflow-x: auto;
+      scrollbar-width: none;
     }
+    .seg-group::-webkit-scrollbar { display: none; }
 
     .seg-btn {
+      flex-shrink: 0;
       border: none;
       background: transparent;
       color: var(--text-muted);
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 700;
       padding: 4px 8px;
       border-radius: 6px;
@@ -421,7 +423,6 @@
       color: #090d16;
     }
 
-    /* 乙標卡片網格 */
     .yi-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -432,7 +433,7 @@
       background: rgba(13, 19, 33, 0.85);
       border: 1px solid var(--border-glass);
       border-radius: 11px;
-      padding: 8px 6px;
+      padding: 7px 5px;
       text-align: center;
       cursor: pointer;
       transition: all 0.15s;
@@ -441,32 +442,16 @@
     .lot-card.selected {
       background: linear-gradient(145deg, rgba(56, 189, 248, 0.22), rgba(15, 23, 42, 0.95));
       border-color: var(--primary);
-      box-shadow: 0 0 14px rgba(56, 189, 248, 0.25);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
     }
 
-    .lot-rate {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    .lot-score {
-      font-size: 1.45rem;
-      font-weight: 800;
-      color: var(--text-main);
-      line-height: 1.15;
-      margin: 2px 0;
-    }
+    .lot-rate { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; }
+    .lot-score { font-size: 1.38rem; font-weight: 800; color: var(--text-main); line-height: 1.15; margin: 2px 0; }
     .lot-card.selected .lot-score { color: var(--primary); }
+    .lot-exact { font-size: 0.6rem; color: var(--text-dim); }
 
-    .lot-exact {
-      font-size: 0.62rem;
-      color: var(--text-dim);
-    }
-
-    /* 單籤 0.50~0.90 放大鏡快查條 */
     .inspector-box {
-      background: rgba(9, 13, 22, 0.75);
+      background: rgba(9, 13, 22, 0.78);
       border: 1px dashed rgba(251, 191, 36, 0.35);
       border-radius: 10px;
       padding: 8px 10px;
@@ -479,10 +464,19 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
     }
 
-    /* 丙標區塊 */
+    .step-badge {
+      font-size: 0.62rem;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--primary);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 1px 5px;
+      border-radius: 4px;
+      margin-left: 3px;
+    }
+
     .bing-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -493,21 +487,52 @@
       background: rgba(13, 19, 33, 0.85);
       border: 1px solid rgba(192, 132, 252, 0.22);
       border-radius: 11px;
-      padding: 8px 6px;
+      padding: 7px 5px;
       text-align: center;
+      cursor: pointer;
     }
 
-    .bing-title {
-      font-size: 0.68rem;
-      color: #d8b4fe;
-      font-weight: 600;
+    .bing-card.selected {
+      background: linear-gradient(145deg, rgba(192, 132, 252, 0.25), rgba(15, 23, 42, 0.95));
+      border-color: var(--purple);
+      box-shadow: 0 0 12px rgba(192, 132, 252, 0.25);
     }
 
-    .bing-val {
-      font-size: 1.35rem;
-      font-weight: 800;
-      color: var(--text-main);
-      margin: 2px 0;
+    .bing-title { font-size: 0.68rem; color: #d8b4fe; font-weight: 600; }
+    .bing-val { font-size: 1.3rem; font-weight: 800; color: var(--text-main); margin: 2px 0; }
+    .bing-card.selected .bing-val { color: var(--purple); }
+
+    .rank-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2px;
+      font-size: 0.78rem;
+      text-align: center;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .rank-table th {
+      background: rgba(9, 13, 22, 0.9);
+      padding: 7px 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    .rank-table td {
+      padding: 6px 4px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+    }
+
+    .rank-table tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .rank-table tr.rank-head-row {
+      background: rgba(251, 191, 36, 0.08);
     }
   </style>
 </head>
@@ -589,10 +614,10 @@
       </div>
     </div>
 
-    <!-- ==================== 分頁 2：週賽標會試算儀 ==================== -->
+    <!-- ==================== 分頁 2：單局標會試算儀 ==================== -->
     <div id="tabBiao" class="tab-view">
       <div class="top-bar">
-        <h1>🏆 週賽標會試算儀</h1>
+        <h1>🏆 單局標會試算</h1>
         <div class="pill-group">
           <button class="pill-btn active-gold" id="rRound" onclick="setRoundMode('round')">四捨五入</button>
           <button class="pill-btn" id="rFloor" onclick="setRoundMode('floor')">捨去</button>
@@ -600,16 +625,15 @@
         </div>
       </div>
 
-      <!-- 甲標分數設定 -->
-      <div class="jia-card">
+      <div class="hero-card">
         <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--gold); font-weight:700;">
-          <span>👑 甲標分數 (最高分)</span>
+          <span>👑 單局甲標 (最高分)</span>
           <span style="color:var(--text-muted); font-weight:500;">點擊數字可直接修改</span>
         </div>
         <div class="jia-main">
           <button class="step-btn" onclick="stepJia(-5)">-5</button>
           <button class="step-btn" onclick="stepJia(-1)">-1</button>
-          <input type="number" id="jiaInput" class="jia-input" value="268" min="100" max="300" oninput="onJiaInput()">
+          <input type="number" id="jiaInput" class="big-input" value="268" min="100" max="300" oninput="onJiaInput()">
           <button class="step-btn" onclick="stepJia(1)">+1</button>
           <button class="step-btn" onclick="stepJia(5)">+5</button>
         </div>
@@ -625,88 +649,220 @@
         </div>
       </div>
 
-      <!-- 乙標智慧籤池產生器 (解決 0.50~0.90 太長的問題) -->
       <div class="generator-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:0.8rem; font-weight:800; color:var(--primary);">🎯 乙標籤筒設定 (0.50 ~ 0.90)</span>
+          <span style="font-size:0.8rem; font-weight:800; color:var(--primary);">🎯 單局乙標籤筒設定</span>
           <span style="font-size:0.72rem; color:var(--text-muted);" id="poolRangeSummary">區間: 204~225</span>
         </div>
 
-        <!-- 步驟 1: 設定最高籤起點 (0.50 ~ 0.90, 每 0.01) -->
         <div class="ctrl-box">
           <div class="ctrl-head">
             <span class="gen-label">① 籤筒最高籤 (起點)</span>
-            <span style="color:var(--gold); font-weight:800; font-size:0.88rem;" id="startRateVal">0.84 籤</span>
+            <span style="color:var(--gold); font-weight:800; font-size:0.86rem;" id="startRateVal">0.84 籤</span>
           </div>
-          <div class="slider-row" style="margin-top:3px;">
-            <button class="step-btn" style="width:28px;height:26px;font-size:0.75rem;" onclick="stepStartRate(-0.01)">-</button>
+          <div class="slider-row" style="margin-top:2px;">
+            <button class="step-btn" style="width:28px;height:24px;font-size:0.75rem;" onclick="stepStartRate(-0.01)">-</button>
             <input type="range" id="startRateSlider" class="gold-slider" min="0.50" max="0.90" step="0.01" value="0.84" oninput="onGenChange()">
-            <button class="step-btn" style="width:28px;height:26px;font-size:0.75rem;" onclick="stepStartRate(0.01)">+</button>
+            <button class="step-btn" style="width:28px;height:24px;font-size:0.75rem;" onclick="stepStartRate(0.01)">+</button>
           </div>
         </div>
 
-        <!-- 步驟 2 & 3: 選擇籤距 與 總籤數 -->
         <div class="gen-row">
           <span class="gen-label">② 每支籤差</span>
           <div class="seg-group">
-            <button class="seg-btn" id="step001" onclick="setLotStep(0.01)">0.01 (連號)</button>
-            <button class="seg-btn active" id="step002" onclick="setLotStep(0.02)">0.02 (雙數/跳號)</button>
+            <button class="seg-btn" id="step001" onclick="setLotStep(0.01)">0.01(連號)</button>
+            <button class="seg-btn active" id="step002" onclick="setLotStep(0.02)">0.02(跳號)</button>
             <button class="seg-btn" id="step003" onclick="setLotStep(0.03)">0.03</button>
             <button class="seg-btn" id="step005" onclick="setLotStep(0.05)">0.05</button>
           </div>
         </div>
 
-        <div class="gen-row">
-          <span class="gen-label">③ 總共幾支籤</span>
-          <div class="seg-group">
-            <button class="seg-btn" id="cnt5" onclick="setLotCount(5)">5支</button>
-            <button class="seg-btn active" id="cnt6" onclick="setLotCount(6)">6支</button>
-            <button class="seg-btn" id="cnt9" onclick="setLotCount(9)">9支</button>
-            <button class="seg-btn" id="cnt12" onclick="setLotCount(12)">12支</button>
+        <!-- 擴充後的總籤數橫向捲動選單 (3支 ~ 15支) -->
+        <div class="ctrl-box">
+          <div class="ctrl-head">
+            <span class="gen-label">③ 總共幾支籤 (可左右滑動點選)</span>
+            <span style="color:var(--primary); font-weight:700; font-size:0.76rem;" id="lotCountLabel">共 6 支籤</span>
           </div>
+          <div class="chips-row" id="lotCountChips" style="margin-top:2px;"></div>
         </div>
 
-        <!-- 動態產生的乙標卡片網格 (點擊任一卡片可連動下方丙標) -->
         <div class="yi-grid" id="yiGrid"></div>
 
-        <!-- 0.50~0.90 單一籤號快速放大鏡滑桿 -->
+        <!-- 連動「每支籤差」的單支快查滑桿 -->
         <div class="inspector-box">
           <div class="inspector-top">
-            <span style="color:var(--text-muted);">🔍 任意單支籤快查 (0.50~0.90 每0.01)：</span>
+            <span style="color:var(--text-muted);">
+              🔍 單支快查 <span class="step-badge" id="quickStepBadge">連動步進 0.02</span>
+            </span>
             <span>
-              <strong style="color:var(--gold);" id="quickRateTxt">0.75 籤</strong> ➔ 
-              <strong style="color:var(--primary); font-size:1.05rem;" id="quickScoreTxt">201 分</strong>
+              <strong style="color:var(--gold);" id="quickRateTxt">0.80 籤</strong> ➔ 
+              <strong style="color:var(--primary); font-size:1rem;" id="quickScoreTxt">214 分</strong>
             </span>
           </div>
-          <input type="range" id="quickInspectSlider" min="0.50" max="0.90" step="0.01" value="0.75" oninput="updateQuickInspect()">
+          <div class="slider-row">
+            <button class="step-btn" style="width:28px;height:24px;font-size:0.75rem;" onclick="stepQuickInspect(-1)">-</button>
+            <input type="range" id="quickInspectSlider" min="0.50" max="0.90" step="0.02" value="0.80" oninput="updateQuickInspect()">
+            <button class="step-btn" style="width:28px;height:24px;font-size:0.75rem;" onclick="stepQuickInspect(1)">+</button>
+          </div>
         </div>
       </div>
 
-      <!-- 丙標預測區塊 -->
       <div class="generator-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:0.8rem; font-weight:800; color:var(--purple);">⚡ 丙標落點預測</span>
+          <span style="font-size:0.8rem; font-weight:800; color:var(--purple);">⚡ 單局丙標預測</span>
           <span style="font-size:0.72rem; color:var(--text-muted);" id="bingBaseHint">基準: 乙標 0.80 (214分)</span>
         </div>
 
         <div class="seg-group" style="display:grid; grid-template-columns:1fr 1fr;">
           <button class="seg-btn active" id="bModeMinus" onclick="setBingMode('minus')">乙標扣分 (-10 ~ -35)</button>
-          <button class="seg-btn" id="bModeLot" onclick="setBingMode('lot')">甲標再抽低籤 (-0.10起)</button>
+          <button class="seg-btn" id="bModeLot" onclick="setBingMode('lot')">甲標再抽低籤 (-0.06起)</button>
         </div>
 
         <div class="bing-grid" id="bingGrid"></div>
       </div>
     </div>
 
-    <!-- ==================== 底部雙分頁切換導航列 ==================== -->
+    <!-- ==================== 分頁 3：總分標會與名次階梯 ==================== -->
+    <div id="tabTotal" class="tab-view">
+      <div class="top-bar">
+        <h1>📊 總分標會 (甲1~丙8)</h1>
+        <div class="pill-group">
+          <button class="pill-btn" id="g3" onclick="setTotalGames(3)">3局</button>
+          <button class="pill-btn" id="g4" onclick="setTotalGames(4)">4局</button>
+          <button class="pill-btn" id="g5" onclick="setTotalGames(5)">5局</button>
+          <button class="pill-btn active-emerald" id="g6" onclick="setTotalGames(6)">6局</button>
+        </div>
+      </div>
+
+      <div class="hero-card emerald-theme">
+        <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--emerald); font-weight:700;">
+          <span id="totalJiaTitle">👑 總分甲1 (6局最高總分)</span>
+          <span style="color:var(--gold); font-weight:700;" id="totalAvgBadge">平均 225.0 / 局</span>
+        </div>
+        <div class="jia-main">
+          <button class="step-btn" onclick="stepTotalJia(-20)">-20</button>
+          <button class="step-btn" onclick="stepTotalJia(-5)">-5</button>
+          <input type="number" id="totalJiaInput" class="big-input emerald-txt" value="1350" min="300" max="2400" oninput="onTotalJiaInput()">
+          <button class="step-btn" onclick="stepTotalJia(5)">+5</button>
+          <button class="step-btn" onclick="stepTotalJia(20)">+20</button>
+        </div>
+        <div class="chips-row" id="totalQuickChips"></div>
+      </div>
+
+      <div class="generator-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.8rem; font-weight:800; color:var(--primary);">🎯 總分乙1 抽籤試算 (點擊連動丙1)</span>
+          <span style="font-size:0.72rem; color:var(--text-muted);" id="totalYiSummary">區間: 1026~1134</span>
+        </div>
+
+        <div class="ctrl-box">
+          <div class="ctrl-head">
+            <span class="gen-label">① 總分最高籤 (起點)</span>
+            <span style="color:var(--gold); font-weight:800; font-size:0.86rem;" id="tStartRateVal">0.84 籤</span>
+          </div>
+          <div class="slider-row" style="margin-top:2px;">
+            <button class="step-btn" style="width:28px;height:24px;font-size:0.75rem;" onclick="stepTStartRate(-0.01)">-</button>
+            <input type="range" id="tStartRateSlider" class="emerald-slider" min="0.50" max="0.90" step="0.01" value="0.84" oninput="onTGenChange()">
+            <button class="step-btn" style="width:28px;height:24px;font-size:0.75rem;" onclick="stepTStartRate(0.01)">+</button>
+          </div>
+        </div>
+
+        <div class="gen-row">
+          <span class="gen-label">② 每支籤差</span>
+          <div class="seg-group">
+            <button class="seg-btn" id="tStep001" onclick="setTLotStep(0.01)">0.01(連號)</button>
+            <button class="seg-btn active" id="tStep002" onclick="setTLotStep(0.02)">0.02(跳號)</button>
+            <button class="seg-btn" id="tStep003" onclick="setTLotStep(0.03)">0.03</button>
+            <button class="seg-btn" id="tStep005" onclick="setTLotStep(0.05)">0.05</button>
+          </div>
+        </div>
+
+        <!-- 總分頁同步擴充：3支 ~ 15支籤快選 -->
+        <div class="ctrl-box">
+          <div class="ctrl-head">
+            <span class="gen-label">③ 總共幾支籤</span>
+            <span style="color:var(--primary); font-weight:700; font-size:0.76rem;" id="tLotCountLabel">共 6 支籤</span>
+          </div>
+          <div class="chips-row" id="tLotCountChips" style="margin-top:2px;"></div>
+        </div>
+
+        <div class="yi-grid" id="totalYiGrid"></div>
+
+        <!-- 連動籤距的總分單籤快查滑桿 -->
+        <div class="inspector-box">
+          <div class="inspector-top">
+            <span style="color:var(--text-muted);">
+              🔍 乙1單支快查 <span class="step-badge" id="tQuickStepBadge">連動步進 0.02</span>
+            </span>
+            <span>
+              <strong style="color:var(--gold);" id="tQuickRateTxt">0.80 籤</strong> ➔ 
+              <strong style="color:var(--primary); font-size:1rem;" id="tQuickScoreTxt">1080 分</strong>
+            </span>
+          </div>
+          <div class="slider-row">
+            <button class="step-btn" style="width:28px;height:24px;font-size:0.75rem;" onclick="stepTQuickInspect(-1)">-</button>
+            <input type="range" id="tQuickSlider" min="0.50" max="0.90" step="0.02" value="0.80" oninput="updateTQuickInspect()">
+            <button class="step-btn" style="width:28px;height:24px;font-size:0.75rem;" onclick="stepTQuickInspect(1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="generator-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.8rem; font-weight:800; color:var(--purple);">⚡ 總分丙1 試算 (點擊可指定丙1基準)</span>
+          <span style="font-size:0.7rem; color:var(--text-muted);" id="totalBingHint">基準: 乙1=1080分</span>
+        </div>
+
+        <div class="seg-group" style="display:grid; grid-template-columns:repeat(3, 1fr);">
+          <button class="seg-btn active" id="tbModeMult" onclick="setTBingMode('mult')">乙1 × 折數</button>
+          <button class="seg-btn" id="tbModeMinus" onclick="setTBingMode('minus')">乙1 - 扣分</button>
+          <button class="seg-btn" id="tbModeJiaLot" onclick="setTBingMode('jialot')">甲1再抽籤</button>
+        </div>
+
+        <div class="bing-grid" id="totalBingGrid"></div>
+      </div>
+
+      <div class="generator-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.8rem; font-weight:800; color:var(--gold);">🏅 甲/乙/丙 1~8 名次落點預估表</span>
+          <div class="seg-group">
+            <button class="seg-btn" id="gap1" onclick="setRankGap(1)">差1分</button>
+            <button class="seg-btn active" id="gap3" onclick="setRankGap(3)">差3分</button>
+            <button class="seg-btn" id="gap5" onclick="setRankGap(5)">差5分</button>
+            <button class="seg-btn" id="gap8" onclick="setRankGap(8)">差8分</button>
+          </div>
+        </div>
+        <div style="font-size:0.68rem; color:var(--text-muted);">
+          ※ 以目前選中的 <strong>甲1</strong>、<strong>乙1</strong>、<strong>丙1</strong> 為第1名基準，依序推算 1~8 名落點與單局均分：
+        </div>
+
+        <table class="rank-table">
+          <thead>
+            <tr>
+              <th style="width:16%; color:var(--text-muted);">名次</th>
+              <th style="width:28%; color:var(--emerald);">甲標 (1~8)</th>
+              <th style="width:28%; color:var(--primary);">乙標 (1~8)</th>
+              <th style="width:28%; color:var(--purple);">丙標 (1~8)</th>
+            </tr>
+          </thead>
+          <tbody id="rankLadderBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ==================== 底部三分頁導航列 ==================== -->
     <nav class="bottom-nav">
       <button class="nav-item active-aim" id="navAim" onclick="switchTab('aim')">
         <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5.5-2.5l7.51-3.49L17.5 6.5 9.99 9.99 6.5 17.5zm5.5-6.6c.61 0 1.1.49 1.1 1.1s-.49 1.1-1.1 1.1-1.1-.49-1.1-1.1.49-1.1 1.1-1.1z"/></svg>
-        <span>球道瞄準器</span>
+        <span>球道瞄準</span>
       </button>
       <button class="nav-item" id="navBiao" onclick="switchTab('biao')">
         <svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/></svg>
-        <span>週賽標會試算</span>
+        <span>單局標會</span>
+      </button>
+      <button class="nav-item" id="navTotal" onclick="switchTab('total')">
+        <svg viewBox="0 0 24 24"><path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z"/></svg>
+        <span>總分甲乙丙</span>
       </button>
     </nav>
 
@@ -715,17 +871,46 @@
   <script>
     /* ================= 分頁切換邏輯 ================= */
     function switchTab(tab) {
-      const isAim = (tab === 'aim');
-      document.getElementById('tabAim').classList.toggle('active', isAim);
-      document.getElementById('tabBiao').classList.toggle('active', !isAim);
+      document.getElementById('tabAim').classList.toggle('active', tab === 'aim');
+      document.getElementById('tabBiao').classList.toggle('active', tab === 'biao');
+      document.getElementById('tabTotal').classList.toggle('active', tab === 'total');
 
-      const navAim = document.getElementById('navAim');
-      const navBiao = document.getElementById('navBiao');
-      navAim.className = 'nav-item ' + (isAim ? 'active-aim' : '');
-      navBiao.className = 'nav-item ' + (!isAim ? 'active-biao' : '');
+      document.getElementById('navAim').className = 'nav-item ' + (tab === 'aim' ? 'active-aim' : '');
+      document.getElementById('navBiao').className = 'nav-item ' + (tab === 'biao' ? 'active-biao' : '');
+      document.getElementById('navTotal').className = 'nav-item ' + (tab === 'total' ? 'active-total' : '');
 
-      if (isAim) renderAim();
-      else renderBiao();
+      if (tab === 'aim') renderAim();
+      else if (tab === 'biao') renderBiao();
+      else renderTotal();
+    }
+
+    /* ================= 共用輔助：讓快查滑桿完美對齊「最高籤起點」與「籤距(Step)」 ================= */
+    const LOT_COUNT_OPTIONS = [3, 4, 5, 6, 7, 8, 9, 10, 12, 15];
+
+    function syncInspectorSlider(sliderId, badgeId, topStartRate, stepSize, currentSelRate) {
+      const slider = document.getElementById(sliderId);
+      const badge = document.getElementById(badgeId);
+      badge.innerText = `連動步進 ${stepSize.toFixed(2)}`;
+
+      // 根據 topStartRate 往回推算 >= 0.50 的最小對齊起點，以及 <= 0.90 的最大對齊終點
+      // 這樣若最高籤是 0.85 (奇數)、籤距 0.02，滑桿就會踏在 0.51, 0.53 ... 0.85, 0.87, 0.89
+      // 若最高籤是 0.84 (偶數)、籤距 0.02，滑桿就會踏在 0.50, 0.52 ... 0.84, 0.86, 0.88, 0.90
+      const stepsDown = Math.floor((topStartRate - 0.50 + 1e-9) / stepSize);
+      const alignedMin = Math.round((topStartRate - stepsDown * stepSize) * 100) / 100;
+
+      const stepsUp = Math.floor((0.90 - topStartRate + 1e-9) / stepSize);
+      const alignedMax = Math.round((topStartRate + stepsUp * stepSize) * 100) / 100;
+
+      slider.min = alignedMin.toFixed(2);
+      slider.max = alignedMax.toFixed(2);
+      slider.step = stepSize.toFixed(2);
+
+      // 將目前選中的籤號吸附到最近的對齊格位上
+      const k = Math.round((currentSelRate - alignedMin) / stepSize);
+      let snapped = Math.round((alignedMin + k * stepSize) * 100) / 100;
+      snapped = Math.max(alignedMin, Math.min(alignedMax, snapped));
+      slider.value = snapped.toFixed(2);
+      return snapped;
     }
 
     /* ================= 分頁 1：球道瞄準器邏輯 ================= */
@@ -887,12 +1072,12 @@
       svg.innerHTML = html;
     }
 
-    /* ================= 分頁 2：週賽標會試算邏輯 ================= */
+    /* ================= 分頁 2：單局標會試算邏輯 ================= */
     let jiaScore = 268;
     let roundMode = 'round';
-    let startRate = 0.84;   // 最高籤起點 (0.50 ~ 0.90)
-    let lotStep = 0.02;     // 每支籤差距 (0.01, 0.02, 0.03, 0.05)
-    let lotCount = 6;       // 總共幾支籤 (5, 6, 9, 12)
+    let startRate = 0.84;
+    let lotStep = 0.02;
+    let lotCount = 6;
     let selectedYiRate = 0.80;
     let bingMode = 'minus';
 
@@ -908,25 +1093,21 @@
       document.getElementById('rFloor').className = 'pill-btn ' + (mode === 'floor' ? 'active-gold' : '');
       document.getElementById('rCeil').className = 'pill-btn ' + (mode === 'ceil' ? 'active-gold' : '');
       renderBiao();
+      renderTotal();
     }
 
     function setJia(val) {
       jiaScore = val;
       document.getElementById('jiaInput').value = val;
-      document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', parseInt(c.innerText, 10) === val));
+      document.querySelectorAll('#tabBiao .hero-card .chip').forEach(c => c.classList.toggle('active', parseInt(c.innerText, 10) === val));
       renderBiao();
     }
 
-    function stepJia(delta) {
-      setJia(Math.max(100, Math.min(300, jiaScore + delta)));
-    }
+    function stepJia(delta) { setJia(Math.max(100, Math.min(300, jiaScore + delta))); }
 
     function onJiaInput() {
       const v = parseInt(document.getElementById('jiaInput').value, 10);
-      if (!isNaN(v)) {
-        jiaScore = Math.max(0, Math.min(300, v));
-        renderBiao();
-      }
+      if (!isNaN(v)) { jiaScore = Math.max(0, Math.min(300, v)); renderBiao(); }
     }
 
     function stepStartRate(delta) {
@@ -938,6 +1119,8 @@
     function onGenChange() {
       startRate = parseFloat(document.getElementById('startRateSlider').value);
       document.getElementById('startRateVal').innerText = startRate.toFixed(2) + ' 籤';
+      // 同步對齊下方快查滑桿
+      selectedYiRate = syncInspectorSlider('quickInspectSlider', 'quickStepBadge', startRate, lotStep, selectedYiRate);
       renderBiao();
     }
 
@@ -947,15 +1130,13 @@
       document.getElementById('step002').classList.toggle('active', step === 0.02);
       document.getElementById('step003').classList.toggle('active', step === 0.03);
       document.getElementById('step005').classList.toggle('active', step === 0.05);
+      // 當切換每支籤差時，立即讓下方快查滑桿改變 step 並對齊格位
+      selectedYiRate = syncInspectorSlider('quickInspectSlider', 'quickStepBadge', startRate, lotStep, selectedYiRate);
       renderBiao();
     }
 
     function setLotCount(cnt) {
       lotCount = cnt;
-      document.getElementById('cnt5').classList.toggle('active', cnt === 5);
-      document.getElementById('cnt6').classList.toggle('active', cnt === 6);
-      document.getElementById('cnt9').classList.toggle('active', cnt === 9);
-      document.getElementById('cnt12').classList.toggle('active', cnt === 12);
       renderBiao();
     }
 
@@ -966,10 +1147,17 @@
     }
 
     function updateQuickInspect() {
-      const qRate = parseFloat(document.getElementById('quickInspectSlider').value);
-      selectedYiRate = qRate;
-      document.getElementById('quickRateTxt').innerText = qRate.toFixed(2) + ' 籤';
-      document.getElementById('quickScoreTxt').innerText = applyRound(jiaScore * qRate) + ' 分';
+      selectedYiRate = parseFloat(document.getElementById('quickInspectSlider').value);
+      renderBiao();
+    }
+
+    function stepQuickInspect(dir) {
+      const slider = document.getElementById('quickInspectSlider');
+      const minV = parseFloat(slider.min);
+      const maxV = parseFloat(slider.max);
+      const next = Math.round((selectedYiRate + dir * lotStep) * 100) / 100;
+      selectedYiRate = Math.max(minV, Math.min(maxV, next));
+      slider.value = selectedYiRate.toFixed(2);
       renderBiao();
     }
 
@@ -981,16 +1169,21 @@
     }
 
     function renderBiao() {
-      // 產生動態乙標籤池 (由最高籤往下遞減，不低於 0.40)
+      // 渲染 3~15 支籤的膠囊按鈕列
+      document.getElementById('lotCountLabel').innerText = `共 ${lotCount} 支籤`;
+      let cntHtml = '';
+      LOT_COUNT_OPTIONS.forEach(c => {
+        cntHtml += `<button class="chip ${c === lotCount ? 'active' : ''}" onclick="setLotCount(${c})">${c}支</button>`;
+      });
+      document.getElementById('lotCountChips').innerHTML = cntHtml;
+
+      // 確保快查滑桿與目前籤差保持同步
+      syncInspectorSlider('quickInspectSlider', 'quickStepBadge', startRate, lotStep, selectedYiRate);
+
       const rates = [];
       for (let i = 0; i < lotCount; i++) {
         const r = Math.round((startRate - i * lotStep) * 100) / 100;
-        if (r >= 0.40) rates.push(r);
-      }
-
-      // 若目前選中的乙標籤不在清單內，預設對齊清單中間那支籤
-      if (!rates.some(r => Math.abs(r - selectedYiRate) < 0.001) && rates.length > 0) {
-        // 保留使用者剛才用放大鏡選的，或初始化
+        if (r >= 0.35) rates.push(r);
       }
 
       const maxScore = applyRound(jiaScore * rates[0]);
@@ -1012,12 +1205,9 @@
       });
       document.getElementById('yiGrid').innerHTML = yiHtml;
 
-      // 更新單籤快查條文字
-      const qRate = parseFloat(document.getElementById('quickInspectSlider').value);
-      document.getElementById('quickRateTxt').innerText = qRate.toFixed(2) + ' 籤';
-      document.getElementById('quickScoreTxt').innerText = applyRound(jiaScore * qRate) + ' 分';
+      document.getElementById('quickRateTxt').innerText = selectedYiRate.toFixed(2) + ' 籤';
+      document.getElementById('quickScoreTxt').innerText = applyRound(jiaScore * selectedYiRate) + ' 分';
 
-      // 渲染丙標
       const baseYiScore = applyRound(jiaScore * selectedYiRate);
       let bingHtml = '';
 
@@ -1034,8 +1224,9 @@
         });
       } else {
         document.getElementById('bingBaseHint').innerText = `基準: 比乙標(${selectedYiRate.toFixed(2)})再低之籤`;
-        [0.06, 0.08, 0.10, 0.12, 0.14, 0.16].forEach(drop => {
-          const bRate = Math.max(0.40, Math.round((selectedYiRate - drop) * 100) / 100);
+        [1, 2, 3, 4, 5, 6].forEach(mult => {
+          const drop = mult * lotStep;
+          const bRate = Math.max(0.35, Math.round((selectedYiRate - drop) * 100) / 100);
           const exact = jiaScore * bRate;
           bingHtml += `
             <div class="bing-card">
@@ -1049,9 +1240,240 @@
       document.getElementById('bingGrid').innerHTML = bingHtml;
     }
 
+    /* ================= 分頁 3：總分標會 (甲1~8 / 乙1~8 / 丙1~8) 邏輯 ================= */
+    let totalGames = 6;
+    let totalJia = 1350;
+    let tStartRate = 0.84;
+    let tLotStep = 0.02;
+    let tLotCount = 6;
+    let tSelectedYiRate = 0.80;
+    let tBingMode = 'mult';
+    let tSelectedBingIdx = 1;
+    let rankGap = 3;
+
+    function setTotalGames(g) {
+      const oldAvg = totalJia / totalGames;
+      totalGames = g;
+      ['g3', 'g4', 'g5', 'g6'].forEach(id => {
+        document.getElementById(id).className = 'pill-btn ' + (id === 'g' + g ? 'active-emerald' : '');
+      });
+      document.getElementById('totalJiaTitle').innerText = `👑 總分甲1 (${g}局最高總分)`;
+      totalJia = Math.round((oldAvg * g) / 5) * 5;
+      document.getElementById('totalJiaInput').value = totalJia;
+      renderTotal();
+    }
+
+    function setTotalJia(val) {
+      totalJia = val;
+      document.getElementById('totalJiaInput').value = val;
+      renderTotal();
+    }
+
+    function stepTotalJia(delta) {
+      setTotalJia(Math.max(300, Math.min(2400, totalJia + delta)));
+    }
+
+    function onTotalJiaInput() {
+      const v = parseInt(document.getElementById('totalJiaInput').value, 10);
+      if (!isNaN(v)) {
+        totalJia = Math.max(100, Math.min(2400, v));
+        renderTotal();
+      }
+    }
+
+    function stepTStartRate(delta) {
+      tStartRate = Math.max(0.50, Math.min(0.90, Math.round((tStartRate + delta) * 100) / 100));
+      document.getElementById('tStartRateSlider').value = tStartRate.toFixed(2);
+      onTGenChange();
+    }
+
+    function onTGenChange() {
+      tStartRate = parseFloat(document.getElementById('tStartRateSlider').value);
+      document.getElementById('tStartRateVal').innerText = tStartRate.toFixed(2) + ' 籤';
+      tSelectedYiRate = syncInspectorSlider('tQuickSlider', 'tQuickStepBadge', tStartRate, tLotStep, tSelectedYiRate);
+      renderTotal();
+    }
+
+    function setTLotStep(step) {
+      tLotStep = step;
+      document.getElementById('tStep001').classList.toggle('active', step === 0.01);
+      document.getElementById('tStep002').classList.toggle('active', step === 0.02);
+      document.getElementById('tStep003').classList.toggle('active', step === 0.03);
+      document.getElementById('tStep005').classList.toggle('active', step === 0.05);
+      tSelectedYiRate = syncInspectorSlider('tQuickSlider', 'tQuickStepBadge', tStartRate, tLotStep, tSelectedYiRate);
+      renderTotal();
+    }
+
+    function setTLotCount(cnt) {
+      tLotCount = cnt;
+      renderTotal();
+    }
+
+    function selectTYi(rate) {
+      tSelectedYiRate = rate;
+      document.getElementById('tQuickSlider').value = rate.toFixed(2);
+      renderTotal();
+    }
+
+    function updateTQuickInspect() {
+      tSelectedYiRate = parseFloat(document.getElementById('tQuickSlider').value);
+      renderTotal();
+    }
+
+    function stepTQuickInspect(dir) {
+      const slider = document.getElementById('tQuickSlider');
+      const minV = parseFloat(slider.min);
+      const maxV = parseFloat(slider.max);
+      const next = Math.round((tSelectedYiRate + dir * tLotStep) * 100) / 100;
+      tSelectedYiRate = Math.max(minV, Math.min(maxV, next));
+      slider.value = tSelectedYiRate.toFixed(2);
+      renderTotal();
+    }
+
+    function setTBingMode(mode) {
+      tBingMode = mode;
+      document.getElementById('tbModeMult').classList.toggle('active', mode === 'mult');
+      document.getElementById('tbModeMinus').classList.toggle('active', mode === 'minus');
+      document.getElementById('tbModeJiaLot').classList.toggle('active', mode === 'jialot');
+      renderTotal();
+    }
+
+    function selectTBingCard(idx) {
+      tSelectedBingIdx = idx;
+      renderTotal();
+    }
+
+    function setRankGap(gap) {
+      rankGap = gap;
+      [1, 3, 5, 8].forEach(g => {
+        document.getElementById('gap' + g).classList.toggle('active', g === gap);
+      });
+      renderTotal();
+    }
+
+    function renderTotal() {
+      const avg = totalJia / totalGames;
+      document.getElementById('totalAvgBadge').innerText = `平均 ${avg.toFixed(1)} / 局`;
+
+      const avgPresets = [240, 230, 225, 220, 215, 210, 200];
+      let chipsHtml = '';
+      avgPresets.forEach(a => {
+        const sc = a * totalGames;
+        const active = (sc === totalJia) ? 'active-em' : '';
+        chipsHtml += `<button class="chip ${active}" onclick="setTotalJia(${sc})">${sc} (均${a})</button>`;
+      });
+      document.getElementById('totalQuickChips').innerHTML = chipsHtml;
+
+      // 渲染總分 3~15 支籤選項
+      document.getElementById('tLotCountLabel').innerText = `共 ${tLotCount} 支籤`;
+      let tCntHtml = '';
+      LOT_COUNT_OPTIONS.forEach(c => {
+        tCntHtml += `<button class="chip ${c === tLotCount ? 'active-em' : ''}" onclick="setTLotCount(${c})">${c}支</button>`;
+      });
+      document.getElementById('tLotCountChips').innerHTML = tCntHtml;
+
+      syncInspectorSlider('tQuickSlider', 'tQuickStepBadge', tStartRate, tLotStep, tSelectedYiRate);
+
+      const rates = [];
+      for (let i = 0; i < tLotCount; i++) {
+        const r = Math.round((tStartRate - i * tLotStep) * 100) / 100;
+        if (r >= 0.35) rates.push(r);
+      }
+
+      const maxYi = applyRound(totalJia * rates[0]);
+      const minYi = applyRound(totalJia * rates[rates.length - 1]);
+      document.getElementById('totalYiSummary').innerText = `本筒乙1: ${minYi} ~ ${maxYi}`;
+
+      let yiHtml = '';
+      rates.forEach(r => {
+        const exact = totalJia * r;
+        const score = applyRound(exact);
+        const pAvg = (score / totalGames).toFixed(1);
+        const isSel = Math.abs(r - tSelectedYiRate) < 0.001;
+        yiHtml += `
+          <div class="lot-card ${isSel ? 'selected' : ''}" onclick="selectTYi(${r})">
+            <div class="lot-rate">${r.toFixed(2)} 籤</div>
+            <div class="lot-score">${score}</div>
+            <div class="lot-exact">均 ${pAvg}/局</div>
+          </div>
+        `;
+      });
+      document.getElementById('totalYiGrid').innerHTML = yiHtml;
+
+      const yi1Score = applyRound(totalJia * tSelectedYiRate);
+      document.getElementById('tQuickRateTxt').innerText = tSelectedYiRate.toFixed(2) + ' 籤';
+      document.getElementById('tQuickScoreTxt').innerText = `${yi1Score} 分 (均${(yi1Score / totalGames).toFixed(1)})`;
+
+      document.getElementById('totalBingHint').innerText = `基準: 乙1 (${tSelectedYiRate.toFixed(2)}) = ${yi1Score}分`;
+      const bingOptions = [];
+
+      if (tBingMode === 'mult') {
+        [0.92, 0.90, 0.88, 0.85, 0.82, 0.80].forEach(m => {
+          const sc = applyRound(yi1Score * m);
+          bingOptions.push({ label: `乙1 × ${m.toFixed(2)}`, score: sc, sub: `均 ${(sc / totalGames).toFixed(1)}` });
+        });
+      } else if (tBingMode === 'minus') {
+        [40, 50, 60, 80, 100, 120].forEach(diff => {
+          const sc = Math.max(0, yi1Score - diff);
+          bingOptions.push({ label: `乙1 - ${diff}分`, score: sc, sub: `均 ${(sc / totalGames).toFixed(1)}` });
+        });
+      } else {
+        [1, 2, 3, 4, 5, 6].forEach(mult => {
+          const drop = mult * tLotStep;
+          const br = Math.max(0.35, Math.round((tSelectedYiRate - drop) * 100) / 100);
+          const sc = applyRound(totalJia * br);
+          bingOptions.push({ label: `甲1 × ${br.toFixed(2)}`, score: sc, sub: `均 ${(sc / totalGames).toFixed(1)}` });
+        });
+      }
+
+      let bingHtml = '';
+      bingOptions.forEach((opt, idx) => {
+        const isSel = (idx === tSelectedBingIdx);
+        bingHtml += `
+          <div class="bing-card ${isSel ? 'selected' : ''}" onclick="selectTBingCard(${idx})">
+            <div class="bing-title">${opt.label}</div>
+            <div class="bing-val">${opt.score}</div>
+            <div class="lot-exact">${opt.sub}</div>
+          </div>
+        `;
+      });
+      document.getElementById('totalBingGrid').innerHTML = bingHtml;
+
+      const bing1Score = bingOptions[tSelectedBingIdx] ? bingOptions[tSelectedBingIdx].score : bingOptions[0].score;
+
+      let tableHtml = '';
+      for (let rank = 1; rank <= 8; rank++) {
+        const drop = (rank - 1) * rankGap;
+        const jVal = Math.max(0, totalJia - drop);
+        const yVal = Math.max(0, yi1Score - drop);
+        const bVal = Math.max(0, bing1Score - drop);
+        const isFirst = (rank === 1);
+
+        tableHtml += `
+          <tr class="${isFirst ? 'rank-head-row' : ''}">
+            <td style="color:${isFirst ? 'var(--gold)' : 'var(--text-muted)'};">${isFirst ? '👑 1名' : rank + '名'}</td>
+            <td style="color:var(--emerald);">
+              甲${rank}：${jVal}
+              <div style="font-size:0.6rem; color:var(--text-dim); font-weight:500;">均 ${(jVal / totalGames).toFixed(1)}</div>
+            </td>
+            <td style="color:var(--primary);">
+              乙${rank}：${yVal}
+              <div style="font-size:0.6rem; color:var(--text-dim); font-weight:500;">均 ${(yVal / totalGames).toFixed(1)}</div>
+            </td>
+            <td style="color:var(--purple);">
+              丙${rank}：${bVal}
+              <div style="font-size:0.6rem; color:var(--text-dim); font-weight:500;">均 ${(bVal / totalGames).toFixed(1)}</div>
+            </td>
+          </tr>
+        `;
+      }
+      document.getElementById('rankLadderBody').innerHTML = tableHtml;
+    }
+
     // 啟動初始化
     renderAim();
     renderBiao();
+    renderTotal();
   </script>
 </body>
 </html>
