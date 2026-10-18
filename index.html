@@ -3,22 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>保齡球幾何瞄準計算器</title>
+  <title>保齡球實戰助手 Pro</title>
 
+  <!-- iOS 桌面 App 專屬設定 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="球道瞄準">
-  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-title" content="保齡球助手">
+  <meta name="theme-color" content="#090d16">
 
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230f172a'/%3E%3Ccircle cx='50' cy='50' r='32' fill='%23ef4444'/%3E%3Ccircle cx='42' cy='40' r='4' fill='%23ffffff'/%3E%3Ccircle cx='58' cy='40' r='4' fill='%23ffffff'/%3E%3Ccircle cx='50' cy='56' r='4' fill='%23ffffff'/%3E%3C/svg%3E">
+  <!-- 專屬黑金紅雙色保齡球圖示 -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23090d16'/%3E%3Ccircle cx='50' cy='50' r='36' fill='%23ef4444' stroke='%23fbbf24' stroke-width='3'/%3E%3Ccircle cx='42' cy='38' r='4' fill='%23ffffff'/%3E%3Ccircle cx='58' cy='38' r='4' fill='%23ffffff'/%3E%3Ccircle cx='50' cy='54' r='4' fill='%23ffffff'/%3E%3C/svg%3E">
 
   <style>
     :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
+      --bg-deep: #090d16;
+      --bg-card: rgba(20, 28, 46, 0.85);
+      --border-glass: rgba(255, 255, 255, 0.09);
+      --primary: #38bdf8;
+      --gold: #fbbf24;
+      --purple: #c084fc;
+      --emerald: #10b981;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
-      --primary: #38bdf8;
+      --text-dim: #64748b;
     }
 
     * {
@@ -35,22 +42,95 @@
       height: 100%;
       height: 100dvh;
       overflow: hidden;
-      background-color: var(--bg);
+      background-color: var(--bg-deep);
+      background-image: 
+        radial-gradient(circle at 15% 10%, rgba(56, 189, 248, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 85% 20%, rgba(251, 191, 36, 0.1) 0%, transparent 45%);
       color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
     }
 
-    .app-wrapper {
+    /* 整體架構：上方內容區 + 底部固定導航列 */
+    .app-shell {
       width: 100%;
-      max-width: 430px;
+      max-width: 440px;
       height: 100%;
       margin: 0 auto;
-      padding: calc(env(safe-area-inset-top, 10px) + 4px) 12px calc(env(safe-area-inset-bottom, 8px) + 4px);
       display: flex;
       flex-direction: column;
+      padding-top: calc(env(safe-area-inset-top, 10px) + 4px);
+    }
+
+    /* 分頁內容區 */
+    .tab-view {
+      display: none;
+      flex: 1;
+      width: 100%;
+      overflow-y: auto;
+      padding: 4px 12px 12px;
+      scrollbar-width: none;
+    }
+    .tab-view::-webkit-scrollbar { display: none; }
+
+    .tab-view.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 分頁 1 (球道瞄準) 鎖定一頁滿版不滾動 */
+    #tabAim.active {
+      overflow: hidden;
       gap: 6px;
     }
 
+    /* 分頁 2 (週賽標會) 允許優雅微滾動 */
+    #tabBiao.active {
+      gap: 10px;
+    }
+
+    /* 底部 iOS 原生感導航列 */
+    .bottom-nav {
+      flex-shrink: 0;
+      height: calc(54px + env(safe-area-inset-bottom, 8px));
+      padding-bottom: env(safe-area-inset-bottom, 8px);
+      background: rgba(13, 19, 33, 0.94);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border-glass);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      z-index: 50;
+    }
+
+    .nav-item {
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .nav-item.active-aim {
+      color: var(--primary);
+    }
+
+    .nav-item.active-biao {
+      color: var(--gold);
+    }
+
+    /* ================= 共用與瞄準器樣式 ================= */
     .top-bar {
       display: flex;
       justify-content: space-between;
@@ -60,37 +140,44 @@
 
     .top-bar h1 {
       font-size: 1.05rem;
-      font-weight: 700;
+      font-weight: 800;
+      letter-spacing: 0.5px;
     }
 
-    .hand-toggle {
+    .pill-group {
       display: flex;
-      background: var(--card-bg);
+      background: var(--bg-card);
       border-radius: 8px;
       padding: 2px;
-      border: 1px solid #334155;
+      border: 1px solid var(--border-glass);
     }
 
-    .toggle-btn {
+    .pill-btn {
       padding: 4px 9px;
       border: none;
       background: transparent;
       color: var(--text-muted);
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       font-weight: 600;
       border-radius: 6px;
       cursor: pointer;
     }
 
-    .toggle-btn.active {
+    .pill-btn.active {
       background: var(--primary);
-      color: #0f172a;
+      color: #090d16;
     }
 
-    /* 緊湊型結果卡片，留更多高度給擬真球道 */
-    .result-card {
+    .pill-btn.active-gold {
+      background: rgba(251, 191, 36, 0.2);
+      color: var(--gold);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+    }
+
+    /* 瞄準結果卡 */
+    .aim-result-card {
       background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-      border: 1px solid #334155;
+      border: 1px solid var(--border-glass);
       border-radius: 12px;
       padding: 8px 12px;
       display: flex;
@@ -99,76 +186,52 @@
       flex-shrink: 0;
     }
 
-    .result-left {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .result-label {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-    }
-
-    .laydown-badge {
-      font-size: 0.75rem;
-      color: #10b981;
-      font-weight: 600;
-    }
-
-    .target-desc {
-      font-size: 0.84rem;
-      color: #e2e8f0;
-      font-weight: 600;
-      margin-top: 2px;
-    }
-
-    .target-board {
-      font-size: 2.35rem;
+    .aim-target-num {
+      font-size: 2.25rem;
       font-weight: 800;
       color: var(--primary);
       line-height: 1;
       text-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
     }
 
-    /* 緊湊型 2x2 滑桿網格，大幅釋放垂直空間給球道 */
-    .controls {
-      background: var(--card-bg);
+    /* 2x2 滑桿網格 */
+    .aim-controls {
+      background: var(--bg-card);
       border-radius: 12px;
       padding: 8px 10px;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px 12px;
-      border: 1px solid #334155;
+      gap: 7px 12px;
+      border: 1px solid var(--border-glass);
       flex-shrink: 0;
     }
 
-    .control-item {
+    .ctrl-box {
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      gap: 2px;
     }
 
-    .control-header {
+    .ctrl-head {
       display: flex;
       justify-content: space-between;
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       font-weight: 500;
     }
 
-    .val-badge {
+    .val-txt {
       color: var(--primary);
       font-weight: 700;
     }
 
-    .slider-wrap {
+    .slider-row {
       display: flex;
       align-items: center;
       gap: 4px;
     }
 
-    .dir-hint {
-      font-size: 0.62rem;
+    .hint-txt {
+      font-size: 0.6rem;
       color: var(--text-muted);
       flex-shrink: 0;
     }
@@ -194,246 +257,528 @@
       cursor: pointer;
     }
 
-    /* 球道顯示區：佔滿所有剩餘螢幕高度 */
-    .canvas-card {
-      background: var(--card-bg);
+    input[type=range].gold-slider::-webkit-slider-thumb {
+      border-color: var(--gold);
+    }
+
+    .lane-card {
+      background: var(--bg-card);
       border-radius: 12px;
       padding: 6px 10px 8px;
       display: flex;
       flex-direction: column;
-      border: 1px solid #334155;
+      border: 1px solid var(--border-glass);
       flex: 1;
-      min-height: 220px;
+      min-height: 180px;
       overflow: hidden;
     }
 
-    .canvas-header {
+    .lane-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       color: var(--text-muted);
       margin-bottom: 4px;
       flex-shrink: 0;
-    }
-
-    .scale-btns {
-      display: flex;
-      gap: 3px;
-      background: #0f172a;
-      padding: 2px;
-      border-radius: 6px;
-    }
-
-    .scale-btn {
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      font-size: 0.66rem;
-      padding: 2px 6px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .scale-btn.active {
-      background: #334155;
-      color: #f8fafc;
-      font-weight: 600;
     }
 
     .svg-box {
       flex: 1;
       width: 100%;
       height: 100%;
-      background: #0b0f19;
+      background: #070a12;
       border-radius: 8px;
       display: flex;
       justify-content: center;
       align-items: center;
       overflow: hidden;
-      position: relative;
     }
 
-    svg {
+    #laneSvg {
       height: 100%;
       display: block;
-      transition: width 0.25s ease;
+      transition: width 0.22s ease;
+    }
+
+    /* ================= 分頁 2：週賽標會專屬樣式 ================= */
+    .jia-card {
+      background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      border-radius: 16px;
+      padding: 12px 14px;
+      box-shadow: 0 8px 25px -8px rgba(251, 191, 36, 0.2);
+      flex-shrink: 0;
+    }
+
+    .jia-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 4px 0 8px;
+    }
+
+    .step-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--border-glass);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-main);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .step-btn:active { background: rgba(251, 191, 36, 0.25); }
+
+    .jia-input {
+      width: 120px;
+      background: transparent;
+      border: none;
+      text-align: center;
+      font-size: 2.7rem;
+      font-weight: 900;
+      color: var(--gold);
+      text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+      outline: none;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .chips-row {
+      display: flex;
+      gap: 5px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .chips-row::-webkit-scrollbar { display: none; }
+
+    .chip {
+      flex-shrink: 0;
+      padding: 4px 10px;
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      color: var(--text-muted);
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .chip.active {
+      background: rgba(251, 191, 36, 0.2);
+      color: var(--gold);
+      border-color: rgba(251, 191, 36, 0.45);
+    }
+
+    /* 籤池產生器設定面板 */
+    .generator-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .gen-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .gen-label {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .seg-group {
+      display: flex;
+      gap: 4px;
+      background: rgba(9, 13, 22, 0.85);
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid var(--border-glass);
+    }
+
+    .seg-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .seg-btn.active {
+      background: var(--primary);
+      color: #090d16;
+    }
+
+    /* 乙標卡片網格 */
+    .yi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+    }
+
+    .lot-card {
+      background: rgba(13, 19, 33, 0.85);
+      border: 1px solid var(--border-glass);
+      border-radius: 11px;
+      padding: 8px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .lot-card.selected {
+      background: linear-gradient(145deg, rgba(56, 189, 248, 0.22), rgba(15, 23, 42, 0.95));
+      border-color: var(--primary);
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.25);
+    }
+
+    .lot-rate {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .lot-score {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.15;
+      margin: 2px 0;
+    }
+    .lot-card.selected .lot-score { color: var(--primary); }
+
+    .lot-exact {
+      font-size: 0.62rem;
+      color: var(--text-dim);
+    }
+
+    /* 單籤 0.50~0.90 放大鏡快查條 */
+    .inspector-box {
+      background: rgba(9, 13, 22, 0.75);
+      border: 1px dashed rgba(251, 191, 36, 0.35);
+      border-radius: 10px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .inspector-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+    }
+
+    /* 丙標區塊 */
+    .bing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+    }
+
+    .bing-card {
+      background: rgba(13, 19, 33, 0.85);
+      border: 1px solid rgba(192, 132, 252, 0.22);
+      border-radius: 11px;
+      padding: 8px 6px;
+      text-align: center;
+    }
+
+    .bing-title {
+      font-size: 0.68rem;
+      color: #d8b4fe;
+      font-weight: 600;
+    }
+
+    .bing-val {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin: 2px 0;
     }
   </style>
 </head>
 <body>
 
-  <div class="app-wrapper">
-    <div class="top-bar">
-      <h1>保齡球瞄準計算器</h1>
-      <div class="hand-toggle">
-        <button class="toggle-btn active" id="btnRight" onclick="setHand('R')">右手 (右1板)</button>
-        <button class="toggle-btn" id="btnLeft" onclick="setHand('L')">左手 (左1板)</button>
+  <div class="app-shell">
+
+    <!-- ==================== 分頁 1：球道幾何瞄準計算器 ==================== -->
+    <div id="tabAim" class="tab-view active">
+      <div class="top-bar">
+        <h1>🎯 球道幾何瞄準器</h1>
+        <div class="pill-group">
+          <button class="pill-btn active" id="btnRight" onclick="setHand('R')">右手 (右1板)</button>
+          <button class="pill-btn" id="btnLeft" onclick="setHand('L')">左手 (左1板)</button>
+        </div>
+      </div>
+
+      <div class="aim-result-card">
+        <div>
+          <div style="font-size: 0.72rem; color: var(--text-muted);">
+            目標箭頭 (15呎) · <span style="color: var(--emerald); font-weight: 600;" id="laydownInfo">落球 20.0 板</span>
+          </div>
+          <div style="font-size: 0.84rem; font-weight: 600; margin-top: 2px;" id="targetDesc">第 3 箭頭 (15板) 往左 0.5 板</div>
+        </div>
+        <div class="aim-target-num" id="targetBoard">15.5</div>
+      </div>
+
+      <div class="aim-controls">
+        <div class="ctrl-box">
+          <div class="ctrl-head"><span>滑步站點</span><span class="val-txt" id="stanceVal">25.0 板</span></div>
+          <div class="slider-row">
+            <span class="hint-txt" id="stanceLeftHint">左39</span>
+            <input type="range" id="stanceSlider" min="1" max="39" step="0.5" value="15" oninput="updateAimSliders()">
+            <span class="hint-txt" id="stanceRightHint">右1</span>
+          </div>
+        </div>
+
+        <div class="ctrl-box">
+          <div class="ctrl-head"><span>轉折點板位</span><span class="val-txt" id="bpBoardVal">8.0 板</span></div>
+          <div class="slider-row">
+            <span class="hint-txt" id="bpLeftHint">左39</span>
+            <input type="range" id="bpSlider" min="1" max="39" step="0.5" value="32" oninput="updateAimSliders()">
+            <span class="hint-txt" id="bpRightHint">右1</span>
+          </div>
+        </div>
+
+        <div class="ctrl-box">
+          <div class="ctrl-head"><span>落球內縮偏移</span><span class="val-txt" id="offsetVal">5.0 板</span></div>
+          <div class="slider-row">
+            <span class="hint-txt">0</span>
+            <input type="range" id="offsetSlider" min="0" max="12" step="0.5" value="5" oninput="updateAimSliders()">
+            <span class="hint-txt">12</span>
+          </div>
+        </div>
+
+        <div class="ctrl-box">
+          <div class="ctrl-head"><span>轉折點距離</span><span class="val-txt" id="bpDistVal">40 呎</span></div>
+          <div class="slider-row">
+            <span class="hint-txt">35</span>
+            <input type="range" id="bpDistSlider" min="35" max="46" step="1" value="40" oninput="updateAimSliders()">
+            <span class="hint-txt">46呎</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="lane-card">
+        <div class="lane-header">
+          <span id="laneLeftLabel">◀ 左39</span>
+          <div class="pill-group">
+            <button class="pill-btn active" id="scaleFit" onclick="setScale('fit')" style="font-size:0.65rem;padding:2px 6px;">實戰寬版</button>
+            <button class="pill-btn" id="scaleSlim" onclick="setScale('slim')" style="font-size:0.65rem;padding:2px 6px;">擬真修長</button>
+            <button class="pill-btn" id="scaleTrue" onclick="setScale('true')" style="font-size:0.65rem;padding:2px 6px;">1:1真實</button>
+          </div>
+          <span id="laneRightLabel">右1 ▶</span>
+        </div>
+        <div class="svg-box">
+          <svg id="laneSvg" viewBox="0 0 260 660" preserveAspectRatio="none" style="width: 100%;"></svg>
+        </div>
       </div>
     </div>
 
-    <div class="result-card">
-      <div class="result-left">
-        <div class="result-label">目標箭頭 (15呎處) · <span class="laydown-badge" id="laydownInfo">落球 20.0 板</span></div>
-        <div class="target-desc" id="targetDesc">第 3 箭頭 (15板) 往左 0.5 板</div>
+    <!-- ==================== 分頁 2：週賽標會試算儀 ==================== -->
+    <div id="tabBiao" class="tab-view">
+      <div class="top-bar">
+        <h1>🏆 週賽標會試算儀</h1>
+        <div class="pill-group">
+          <button class="pill-btn active-gold" id="rRound" onclick="setRoundMode('round')">四捨五入</button>
+          <button class="pill-btn" id="rFloor" onclick="setRoundMode('floor')">捨去</button>
+          <button class="pill-btn" id="rCeil" onclick="setRoundMode('ceil')">進位</button>
+        </div>
       </div>
-      <div class="target-board" id="targetBoard">15.5</div>
+
+      <!-- 甲標分數設定 -->
+      <div class="jia-card">
+        <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--gold); font-weight:700;">
+          <span>👑 甲標分數 (最高分)</span>
+          <span style="color:var(--text-muted); font-weight:500;">點擊數字可直接修改</span>
+        </div>
+        <div class="jia-main">
+          <button class="step-btn" onclick="stepJia(-5)">-5</button>
+          <button class="step-btn" onclick="stepJia(-1)">-1</button>
+          <input type="number" id="jiaInput" class="jia-input" value="268" min="100" max="300" oninput="onJiaInput()">
+          <button class="step-btn" onclick="stepJia(1)">+1</button>
+          <button class="step-btn" onclick="stepJia(5)">+5</button>
+        </div>
+        <div class="chips-row">
+          <button class="chip" onclick="setJia(300)">300</button>
+          <button class="chip" onclick="setJia(290)">290</button>
+          <button class="chip" onclick="setJia(279)">279</button>
+          <button class="chip active" onclick="setJia(268)">268</button>
+          <button class="chip" onclick="setJia(258)">258</button>
+          <button class="chip" onclick="setJia(246)">246</button>
+          <button class="chip" onclick="setJia(235)">235</button>
+          <button class="chip" onclick="setJia(225)">225</button>
+        </div>
+      </div>
+
+      <!-- 乙標智慧籤池產生器 (解決 0.50~0.90 太長的問題) -->
+      <div class="generator-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.8rem; font-weight:800; color:var(--primary);">🎯 乙標籤筒設定 (0.50 ~ 0.90)</span>
+          <span style="font-size:0.72rem; color:var(--text-muted);" id="poolRangeSummary">區間: 204~225</span>
+        </div>
+
+        <!-- 步驟 1: 設定最高籤起點 (0.50 ~ 0.90, 每 0.01) -->
+        <div class="ctrl-box">
+          <div class="ctrl-head">
+            <span class="gen-label">① 籤筒最高籤 (起點)</span>
+            <span style="color:var(--gold); font-weight:800; font-size:0.88rem;" id="startRateVal">0.84 籤</span>
+          </div>
+          <div class="slider-row" style="margin-top:3px;">
+            <button class="step-btn" style="width:28px;height:26px;font-size:0.75rem;" onclick="stepStartRate(-0.01)">-</button>
+            <input type="range" id="startRateSlider" class="gold-slider" min="0.50" max="0.90" step="0.01" value="0.84" oninput="onGenChange()">
+            <button class="step-btn" style="width:28px;height:26px;font-size:0.75rem;" onclick="stepStartRate(0.01)">+</button>
+          </div>
+        </div>
+
+        <!-- 步驟 2 & 3: 選擇籤距 與 總籤數 -->
+        <div class="gen-row">
+          <span class="gen-label">② 每支籤差</span>
+          <div class="seg-group">
+            <button class="seg-btn" id="step001" onclick="setLotStep(0.01)">0.01 (連號)</button>
+            <button class="seg-btn active" id="step002" onclick="setLotStep(0.02)">0.02 (雙數/跳號)</button>
+            <button class="seg-btn" id="step003" onclick="setLotStep(0.03)">0.03</button>
+            <button class="seg-btn" id="step005" onclick="setLotStep(0.05)">0.05</button>
+          </div>
+        </div>
+
+        <div class="gen-row">
+          <span class="gen-label">③ 總共幾支籤</span>
+          <div class="seg-group">
+            <button class="seg-btn" id="cnt5" onclick="setLotCount(5)">5支</button>
+            <button class="seg-btn active" id="cnt6" onclick="setLotCount(6)">6支</button>
+            <button class="seg-btn" id="cnt9" onclick="setLotCount(9)">9支</button>
+            <button class="seg-btn" id="cnt12" onclick="setLotCount(12)">12支</button>
+          </div>
+        </div>
+
+        <!-- 動態產生的乙標卡片網格 (點擊任一卡片可連動下方丙標) -->
+        <div class="yi-grid" id="yiGrid"></div>
+
+        <!-- 0.50~0.90 單一籤號快速放大鏡滑桿 -->
+        <div class="inspector-box">
+          <div class="inspector-top">
+            <span style="color:var(--text-muted);">🔍 任意單支籤快查 (0.50~0.90 每0.01)：</span>
+            <span>
+              <strong style="color:var(--gold);" id="quickRateTxt">0.75 籤</strong> ➔ 
+              <strong style="color:var(--primary); font-size:1.05rem;" id="quickScoreTxt">201 分</strong>
+            </span>
+          </div>
+          <input type="range" id="quickInspectSlider" min="0.50" max="0.90" step="0.01" value="0.75" oninput="updateQuickInspect()">
+        </div>
+      </div>
+
+      <!-- 丙標預測區塊 -->
+      <div class="generator-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.8rem; font-weight:800; color:var(--purple);">⚡ 丙標落點預測</span>
+          <span style="font-size:0.72rem; color:var(--text-muted);" id="bingBaseHint">基準: 乙標 0.80 (214分)</span>
+        </div>
+
+        <div class="seg-group" style="display:grid; grid-template-columns:1fr 1fr;">
+          <button class="seg-btn active" id="bModeMinus" onclick="setBingMode('minus')">乙標扣分 (-10 ~ -35)</button>
+          <button class="seg-btn" id="bModeLot" onclick="setBingMode('lot')">甲標再抽低籤 (-0.10起)</button>
+        </div>
+
+        <div class="bing-grid" id="bingGrid"></div>
+      </div>
     </div>
 
-    <!-- 2x2 緊湊滑桿，把最大高度讓給下方 60 呎球道 -->
-    <div class="controls">
-      <div class="control-item">
-        <div class="control-header">
-          <span>滑步站點</span>
-          <span class="val-badge" id="stanceVal">25.0 板</span>
-        </div>
-        <div class="slider-wrap">
-          <span class="dir-hint" id="stanceLeftHint">左39</span>
-          <input type="range" id="stanceSlider" min="1" max="39" step="0.5" value="15" oninput="updateFromSliders()">
-          <span class="dir-hint" id="stanceRightHint">右1</span>
-        </div>
-      </div>
+    <!-- ==================== 底部雙分頁切換導航列 ==================== -->
+    <nav class="bottom-nav">
+      <button class="nav-item active-aim" id="navAim" onclick="switchTab('aim')">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5.5-2.5l7.51-3.49L17.5 6.5 9.99 9.99 6.5 17.5zm5.5-6.6c.61 0 1.1.49 1.1 1.1s-.49 1.1-1.1 1.1-1.1-.49-1.1-1.1.49-1.1 1.1-1.1z"/></svg>
+        <span>球道瞄準器</span>
+      </button>
+      <button class="nav-item" id="navBiao" onclick="switchTab('biao')">
+        <svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/></svg>
+        <span>週賽標會試算</span>
+      </button>
+    </nav>
 
-      <div class="control-item">
-        <div class="control-header">
-          <span>轉折點板位</span>
-          <span class="val-badge" id="bpBoardVal">8.0 板</span>
-        </div>
-        <div class="slider-wrap">
-          <span class="dir-hint" id="bpLeftHint">左39</span>
-          <input type="range" id="bpSlider" min="1" max="39" step="0.5" value="32" oninput="updateFromSliders()">
-          <span class="dir-hint" id="bpRightHint">右1</span>
-        </div>
-      </div>
-
-      <div class="control-item">
-        <div class="control-header">
-          <span>落球內縮偏移</span>
-          <span class="val-badge" id="offsetVal">5.0 板</span>
-        </div>
-        <div class="slider-wrap">
-          <span class="dir-hint">0</span>
-          <input type="range" id="offsetSlider" min="0" max="12" step="0.5" value="5" oninput="updateFromSliders()">
-          <span class="dir-hint">12</span>
-        </div>
-      </div>
-
-      <div class="control-item">
-        <div class="control-header">
-          <span>轉折點距離</span>
-          <span class="val-badge" id="bpDistVal">40 呎</span>
-        </div>
-        <div class="slider-wrap">
-          <span class="dir-hint">35</span>
-          <input type="range" id="bpDistSlider" min="35" max="46" step="1" value="40" oninput="updateFromSliders()">
-          <span class="dir-hint">46呎</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="canvas-card">
-      <div class="canvas-header">
-        <span id="laneLeftLabel">◀ 左39</span>
-        <div class="scale-btns">
-          <button class="scale-btn active" id="scaleFit" onclick="setScale('fit')">實戰寬版</button>
-          <button class="scale-btn" id="scaleSlim" onclick="setScale('slim')">擬真修長</button>
-          <button class="scale-btn" id="scaleTrue" onclick="setScale('true')">1:1真實(極窄)</button>
-        </div>
-        <span id="laneRightLabel">右1 ▶</span>
-      </div>
-      <div class="svg-box">
-        <svg id="laneSvg" viewBox="0 0 260 660" preserveAspectRatio="none" style="width: 100%;"></svg>
-      </div>
-    </div>
   </div>
 
   <script>
+    /* ================= 分頁切換邏輯 ================= */
+    function switchTab(tab) {
+      const isAim = (tab === 'aim');
+      document.getElementById('tabAim').classList.toggle('active', isAim);
+      document.getElementById('tabBiao').classList.toggle('active', !isAim);
+
+      const navAim = document.getElementById('navAim');
+      const navBiao = document.getElementById('navBiao');
+      navAim.className = 'nav-item ' + (isAim ? 'active-aim' : '');
+      navBiao.className = 'nav-item ' + (!isAim ? 'active-biao' : '');
+
+      if (isAim) renderAim();
+      else renderBiao();
+    }
+
+    /* ================= 分頁 1：球道瞄準器邏輯 ================= */
     let currentHand = 'R';
     let stanceBoard = 25;
     let bpBoard = 8;
     let currentScale = 'fit';
 
-    function sliderToBoard(val) {
-      return currentHand === 'R' ? (40 - val) : val;
-    }
-    function boardToSlider(board) {
-      return currentHand === 'R' ? (40 - board) : board;
-    }
+    function sliderToBoard(val) { return currentHand === 'R' ? (40 - val) : val; }
+    function boardToSlider(board) { return currentHand === 'R' ? (40 - board) : board; }
 
     function setScale(mode) {
       currentScale = mode;
       document.getElementById('scaleFit').classList.toggle('active', mode === 'fit');
       document.getElementById('scaleSlim').classList.toggle('active', mode === 'slim');
       document.getElementById('scaleTrue').classList.toggle('active', mode === 'true');
-
       const svg = document.getElementById('laneSvg');
-      if (mode === 'fit') {
-        svg.style.width = '100%';
-        svg.setAttribute('preserveAspectRatio', 'none');
-      } else if (mode === 'slim') {
-        svg.style.width = '52%';
-        svg.setAttribute('preserveAspectRatio', 'none');
-      } else {
-        // 真實 60 呎 x 3.46 呎 (17.3:1 長寬比)
-        svg.style.width = '16%';
-        svg.setAttribute('preserveAspectRatio', 'none');
-      }
-      render();
+      svg.style.width = (mode === 'fit') ? '100%' : (mode === 'slim' ? '52%' : '16%');
+      renderAim();
     }
 
     function setHand(hand) {
       currentHand = hand;
       document.getElementById('btnRight').classList.toggle('active', hand === 'R');
       document.getElementById('btnLeft').classList.toggle('active', hand === 'L');
-
-      if (hand === 'R') {
-        document.getElementById('stanceLeftHint').innerText = '左39';
-        document.getElementById('stanceRightHint').innerText = '右1';
-        document.getElementById('bpLeftHint').innerText = '左39';
-        document.getElementById('bpRightHint').innerText = '右1';
-        document.getElementById('laneLeftLabel').innerText = '◀ 左39';
-        document.getElementById('laneRightLabel').innerText = '右1 ▶';
-      } else {
-        document.getElementById('stanceLeftHint').innerText = '左1';
-        document.getElementById('stanceRightHint').innerText = '右39';
-        document.getElementById('bpLeftHint').innerText = '左1';
-        document.getElementById('bpRightHint').innerText = '右39';
-        document.getElementById('laneLeftLabel').innerText = '◀ 左1';
-        document.getElementById('laneRightLabel').innerText = '右39 ▶';
-      }
+      const isR = (hand === 'R');
+      document.getElementById('stanceLeftHint').innerText = isR ? '左39' : '左1';
+      document.getElementById('stanceRightHint').innerText = isR ? '右1' : '右39';
+      document.getElementById('bpLeftHint').innerText = isR ? '左39' : '左1';
+      document.getElementById('bpRightHint').innerText = isR ? '右1' : '右39';
+      document.getElementById('laneLeftLabel').innerText = isR ? '◀ 左39' : '◀ 左1';
+      document.getElementById('laneRightLabel').innerText = isR ? '右1 ▶' : '右39 ▶';
 
       document.getElementById('stanceSlider').value = boardToSlider(stanceBoard);
       document.getElementById('bpSlider').value = boardToSlider(bpBoard);
-      render();
+      renderAim();
     }
 
-    function updateFromSliders() {
-      const sVal = parseFloat(document.getElementById('stanceSlider').value);
-      const bVal = parseFloat(document.getElementById('bpSlider').value);
-      stanceBoard = sliderToBoard(sVal);
-      bpBoard = sliderToBoard(bVal);
-      render();
+    function updateAimSliders() {
+      stanceBoard = sliderToBoard(parseFloat(document.getElementById('stanceSlider').value));
+      bpBoard = sliderToBoard(parseFloat(document.getElementById('bpSlider').value));
+      renderAim();
     }
 
-    // 球道繪製座標：X 範圍 30 ~ 230 (寬 200 對應 39 塊板)
     function boardToX(board) {
-      const leftEdge = 30;
-      const laneW = 200;
-      if (currentHand === 'R') {
-        return leftEdge + ((39 - board) / 38) * laneW;
-      } else {
-        return leftEdge + ((board - 1) / 38) * laneW;
-      }
+      return 30 + ((currentHand === 'R' ? (39 - board) : (board - 1)) / 38) * 200;
     }
 
-    // Y 座標換算：0 呎犯規線在 Y=620，60 呎 1號瓶在 Y=45 (完整等比例對應 0~60 呎)
     function ftToY(ft) {
-      const yFoul = 620;
-      const y60 = 45;
-      return yFoul - (ft / 60) * (yFoul - y60);
+      return 620 - (ft / 60) * (620 - 45);
     }
 
-    function render() {
+    function renderAim() {
       const offset = parseFloat(document.getElementById('offsetSlider').value);
       const bpDist = parseFloat(document.getElementById('bpDistSlider').value);
 
@@ -448,18 +793,14 @@
       const targetArrow = laydown + (15 / bpDist) * (bpBoard - laydown);
       document.getElementById('targetBoard').innerText = targetArrow.toFixed(1);
 
-      let closestArrow = Math.round(targetArrow / 5);
-      closestArrow = Math.max(1, Math.min(7, closestArrow));
+      let closestArrow = Math.max(1, Math.min(7, Math.round(targetArrow / 5)));
       const refBoard = closestArrow * 5;
       const diff = targetArrow - refBoard;
 
-      let desc = '第 ' + closestArrow + ' 箭頭 (' + refBoard + '板)';
+      let desc = `第 ${closestArrow} 箭頭 (${refBoard}板)`;
       if (Math.abs(diff) >= 0.2) {
-        if (currentHand === 'R') {
-          desc += diff > 0 ? ' 往左 ' + Math.abs(diff).toFixed(1) + ' 板' : ' 往右 ' + Math.abs(diff).toFixed(1) + ' 板';
-        } else {
-          desc += diff > 0 ? ' 往右 ' + Math.abs(diff).toFixed(1) + ' 板' : ' 往左 ' + Math.abs(diff).toFixed(1) + ' 板';
-        }
+        const goLeft = (currentHand === 'R') ? (diff > 0) : (diff < 0);
+        desc += ` 往${goLeft ? '左' : '右'} ${Math.abs(diff).toFixed(1)} 板`;
       } else {
         desc += ' 正中央';
       }
@@ -470,130 +811,247 @@
 
     function drawRealisticLane(stance, laydown, arrow, bp, bpDist) {
       const svg = document.getElementById('laneSvg');
-      const yFoul = ftToY(0);
-      const yTop = ftToY(63);
-      const yBp = ftToY(bpDist);
-
+      const yFoul = ftToY(0), yTop = ftToY(63), yBp = ftToY(bpDist);
       let html = '';
 
-      // 1. 兩側水溝 (Gutters) 與楓木球道底色
       html += `<rect x="18" y="${yTop}" width="12" height="${yFoul - yTop + 30}" fill="#111827" />`;
       html += `<rect x="230" y="${yTop}" width="12" height="${yFoul - yTop + 30}" fill="#111827" />`;
       html += `<rect x="30" y="${yTop}" width="200" height="${yFoul - yTop}" fill="#2b2116" />`;
-      // 助走道 (Approach 0呎以下)
       html += `<rect x="30" y="${yFoul}" width="200" height="35" fill="#231a11" />`;
-
-      // 2. 藍色上油區視覺層 (0 呎 ~ 轉折點距離)
       html += `<rect x="30" y="${yBp}" width="200" height="${yFoul - yBp}" fill="rgba(56, 189, 248, 0.08)" />`;
       html += `<line x1="30" y1="${yBp}" x2="230" y2="${yBp}" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1.5" stroke-dasharray="4,4" />`;
 
-      // 3. 繪製全部 39 塊板的細線與每 5 板重點線
       for (let b = 1; b <= 39; b++) {
         const x = boardToX(b);
         if (b % 5 === 0) {
-          const isCenter = (b === 20);
-          html += `<line x1="${x}" y1="${yTop}" x2="${x}" y2="${yFoul + 30}" stroke="${isCenter ? '#785a37' : '#4a3723'}" stroke-width="${isCenter ? 2 : 1.2}" />`;
-          if (currentScale !== 'true') {
-            html += `<text x="${x}" y="648" fill="#94a3b8" font-size="11" text-anchor="middle">${b}</text>`;
-          }
+          const isC = (b === 20);
+          html += `<line x1="${x}" y1="${yTop}" x2="${x}" y2="${yFoul + 30}" stroke="${isC ? '#785a37' : '#4a3723'}" stroke-width="${isC ? 2 : 1.2}" />`;
+          if (currentScale !== 'true') html += `<text x="${x}" y="648" fill="#94a3b8" font-size="11" text-anchor="middle">${b}</text>`;
         } else if (currentScale === 'fit') {
           html += `<line x1="${x}" y1="${yTop}" x2="${x}" y2="${yFoul}" stroke="#332619" stroke-width="0.5" />`;
         }
       }
 
-      // 4. 左側真實距離尺標 (0ft, 15ft, 30ft, 40ft, 60ft)
       if (currentScale !== 'true') {
-        const marks = [0, 15, 30, 40, 60];
-        marks.forEach(ft => {
-          const y = ftToY(ft);
-          html += `<text x="15" y="${y + 4}" fill="#64748b" font-size="9" text-anchor="end">${ft}'</text>`;
+        [0, 15, 30, 40, 60].forEach(ft => {
+          html += `<text x="15" y="${ftToY(ft) + 4}" fill="#64748b" font-size="9" text-anchor="end">${ft}'</text>`;
         });
       }
 
-      // 5. 真實球道地標：7 呎與 12 呎定位圓點 (Range Finder Dots)
-      [5, 8, 11, 14, 20, 26, 29, 32, 35].forEach(b => {
-        html += `<circle cx="${boardToX(b)}" cy="${ftToY(7)}" r="1.8" fill="#64748b" />`;
-      });
-      [3, 5, 8, 11, 14, 26, 29, 32, 35, 37].forEach(b => {
-        html += `<circle cx="${boardToX(b)}" cy="${ftToY(12)}" r="2" fill="#94a3b8" />`;
-      });
+      [5, 8, 11, 14, 20, 26, 29, 32, 35].forEach(b => html += `<circle cx="${boardToX(b)}" cy="${ftToY(7)}" r="1.8" fill="#64748b" />`);
+      [3, 5, 8, 11, 14, 26, 29, 32, 35, 37].forEach(b => html += `<circle cx="${boardToX(b)}" cy="${ftToY(12)}" r="2" fill="#94a3b8" />`);
 
-      // 6. 真實 15 呎 V 字排列目標箭頭 (Chevron Arrows: 20板在16呎，5/35板在15呎)
       for (let b = 5; b <= 35; b += 5) {
         const ax = boardToX(b);
-        const arrowFt = 16 - (Math.abs(20 - b) / 15) * 1.2; // V字高度差
-        const ay = ftToY(arrowFt);
-        const active = Math.abs(b - arrow) <= 2.5;
-        const fill = active ? '#38bdf8' : '#94a3b8';
+        const ay = ftToY(16 - (Math.abs(20 - b) / 15) * 1.2);
+        const fill = Math.abs(b - arrow) <= 2.5 ? '#38bdf8' : '#94a3b8';
         html += `<polygon points="${ax},${ay - 9} ${ax - 4},${ay + 5} ${ax + 4},${ay + 5}" fill="${fill}" />`;
       }
 
-      // 7. 遠端 34~35 呎與 40~43 呎導引線 (Downlane Markers / Tracers)
       [10, 15, 20, 25, 30].forEach(b => {
         const mx = boardToX(b);
         html += `<line x1="${mx}" y1="${ftToY(35)}" x2="${mx}" y2="${ftToY(34)}" stroke="#64748b" stroke-width="2" />`;
         html += `<line x1="${mx}" y1="${ftToY(43)}" x2="${mx}" y2="${ftToY(40)}" stroke="#94a3b8" stroke-width="2" />`;
       });
 
-      // 8. 頂部 60 呎 10 顆球瓶真實板位排列
-      // 第1排(60ft): 20板 | 第2排(61ft): 15, 25板 | 第3排(62ft): 10, 20, 30板 | 第4排(63ft): 5, 15, 25, 35板
       const pins = [
-        { b: 20, ft: 60 },
-        { b: 15, ft: 61 }, { b: 25, ft: 61 },
+        { b: 20, ft: 60 }, { b: 15, ft: 61 }, { b: 25, ft: 61 },
         { b: 10, ft: 62 }, { b: 20, ft: 62 }, { b: 30, ft: 62 },
-        { b: 5, ft: 63 },  { b: 15, ft: 63 }, { b: 25, ft: 63 }, { b: 35, ft: 63 }
+        { b: 5, ft: 63 }, { b: 15, ft: 63 }, { b: 25, ft: 63 }, { b: 35, ft: 63 }
       ];
-      pins.forEach((p, idx) => {
-        const px = boardToX(p.b);
-        const py = ftToY(p.ft);
-        const isHeadPin = (idx === 0);
-        html += `<circle cx="${px}" cy="${py}" r="4.5" fill="#f8fafc" stroke="${isHeadPin ? '#ef4444' : '#64748b'}" stroke-width="1.5" />`;
+      pins.forEach((p, i) => {
+        html += `<circle cx="${boardToX(p.b)}" cy="${ftToY(p.ft)}" r="4.5" fill="#f8fafc" stroke="${i === 0 ? '#ef4444' : '#64748b'}" stroke-width="1.5" />`;
       });
 
-      // 9. 犯規線 (0 呎)
       html += `<line x1="30" y1="${yFoul}" x2="230" y2="${yFoul}" stroke="#ef4444" stroke-width="2" />`;
 
-      // 10. 繪製球的軌跡：落球(0呎) -> 箭頭(15呎) -> 轉折點(bpDist) -> 1-3/1-2 Pocket (60呎 17.5板)
-      const xStance = boardToX(stance);
-      const xLaydown = boardToX(laydown);
-      const xArrow = boardToX(arrow);
-      const xBp = boardToX(bp);
-      const xPocket = boardToX(17.5);
-      const yArrow = ftToY(15);
-      const yPocket = ftToY(60);
+      const xStance = boardToX(stance), xLay = boardToX(laydown), xArr = boardToX(arrow), xBp = boardToX(bp), xPoc = boardToX(17.5);
+      const yArr = ftToY(15), yPoc = ftToY(60);
 
-      // 滑步腳與落球偏移連線
-      html += `<line x1="${xStance}" y1="${yFoul}" x2="${xLaydown}" y2="${yFoul}" stroke="#94a3b8" stroke-width="2" stroke-dasharray="3,3" />`;
+      html += `<line x1="${xStance}" y1="${yFoul}" x2="${xLay}" y2="${yFoul}" stroke="#94a3b8" stroke-width="2" stroke-dasharray="3,3" />`;
       html += `<circle cx="${xStance}" cy="${yFoul}" r="5" fill="#231a11" stroke="#94a3b8" stroke-width="2" />`;
+      html += `<polyline points="${xLay},${yFoul} ${xArr},${yArr} ${xBp},${yBp}" fill="none" stroke="#f59e0b" stroke-width="3.5" />`;
+      html += `<path d="M ${xBp} ${yBp} Q ${xBp} ${(yBp + yPoc) / 2} ${xPoc} ${yPoc}" fill="none" stroke="#ef4444" stroke-width="3" stroke-dasharray="5,3" />`;
 
-      // 前中段直線推進軌跡 (Skid / Roll phase)
-      html += `<polyline points="${xLaydown},${yFoul} ${xArrow},${yArrow} ${xBp},${yBp}" fill="none" stroke="#f59e0b" stroke-width="3.5" />`;
-
-      // 後段轉折進 Pocket (Hook phase 二次貝茲平滑曲線)
-      const ctrlY = (yBp + yPocket) / 2;
-      html += `<path d="M ${xBp} ${yBp} Q ${xBp} ${ctrlY} ${xPocket} ${yPocket}" fill="none" stroke="#ef4444" stroke-width="3" stroke-dasharray="5,3" />`;
-
-      // 節點與清晰文字標籤
-      html += `<circle cx="${xLaydown}" cy="${yFoul}" r="5.5" fill="#10b981" />`;
-      html += `<circle cx="${xArrow}" cy="${yArrow}" r="5.5" fill="#38bdf8" />`;
+      html += `<circle cx="${xLay}" cy="${yFoul}" r="5.5" fill="#10b981" />`;
+      html += `<circle cx="${xArr}" cy="${yArr}" r="5.5" fill="#38bdf8" />`;
       html += `<circle cx="${xBp}" cy="${yBp}" r="5.5" fill="#ef4444" />`;
 
       if (currentScale !== 'true') {
-        const alignLeft = currentHand === 'R';
-        function labelTag(x, y, text, color, toLeft) {
-          const tx = toLeft ? (x - 9) : (x + 9);
-          const anchor = toLeft ? 'end' : 'start';
-          return `<text x="${tx}" y="${y + 4}" fill="${color}" font-size="12" font-weight="bold" text-anchor="${anchor}">${text}</text>`;
-        }
-        html += labelTag(xLaydown, yFoul - 8, `${laydown.toFixed(1)}板`, '#10b981', !alignLeft);
-        html += labelTag(xArrow, yArrow, `瞄${arrow.toFixed(1)}`, '#38bdf8', alignLeft);
-        html += labelTag(xBp, yBp, `折${bp.toFixed(1)} (${bpDist}')`, '#f87171', alignLeft);
+        const alignL = currentHand === 'R';
+        const tag = (x, y, t, c, l) => `<text x="${l ? x - 9 : x + 9}" y="${y + 4}" fill="${c}" font-size="12" font-weight="bold" text-anchor="${l ? 'end' : 'start'}">${t}</text>`;
+        html += tag(xLay, yFoul - 8, `${laydown.toFixed(1)}板`, '#10b981', !alignL);
+        html += tag(xArr, yArr, `瞄${arrow.toFixed(1)}`, '#38bdf8', alignL);
+        html += tag(xBp, yBp, `折${bp.toFixed(1)}(${bpDist}')`, '#f87171', alignL);
       }
-
       svg.innerHTML = html;
     }
 
-    render();
+    /* ================= 分頁 2：週賽標會試算邏輯 ================= */
+    let jiaScore = 268;
+    let roundMode = 'round';
+    let startRate = 0.84;   // 最高籤起點 (0.50 ~ 0.90)
+    let lotStep = 0.02;     // 每支籤差距 (0.01, 0.02, 0.03, 0.05)
+    let lotCount = 6;       // 總共幾支籤 (5, 6, 9, 12)
+    let selectedYiRate = 0.80;
+    let bingMode = 'minus';
+
+    function applyRound(val) {
+      if (roundMode === 'floor') return Math.floor(val + 1e-9);
+      if (roundMode === 'ceil') return Math.ceil(val - 1e-9);
+      return Math.round(val);
+    }
+
+    function setRoundMode(mode) {
+      roundMode = mode;
+      document.getElementById('rRound').className = 'pill-btn ' + (mode === 'round' ? 'active-gold' : '');
+      document.getElementById('rFloor').className = 'pill-btn ' + (mode === 'floor' ? 'active-gold' : '');
+      document.getElementById('rCeil').className = 'pill-btn ' + (mode === 'ceil' ? 'active-gold' : '');
+      renderBiao();
+    }
+
+    function setJia(val) {
+      jiaScore = val;
+      document.getElementById('jiaInput').value = val;
+      document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', parseInt(c.innerText, 10) === val));
+      renderBiao();
+    }
+
+    function stepJia(delta) {
+      setJia(Math.max(100, Math.min(300, jiaScore + delta)));
+    }
+
+    function onJiaInput() {
+      const v = parseInt(document.getElementById('jiaInput').value, 10);
+      if (!isNaN(v)) {
+        jiaScore = Math.max(0, Math.min(300, v));
+        renderBiao();
+      }
+    }
+
+    function stepStartRate(delta) {
+      startRate = Math.max(0.50, Math.min(0.90, Math.round((startRate + delta) * 100) / 100));
+      document.getElementById('startRateSlider').value = startRate.toFixed(2);
+      onGenChange();
+    }
+
+    function onGenChange() {
+      startRate = parseFloat(document.getElementById('startRateSlider').value);
+      document.getElementById('startRateVal').innerText = startRate.toFixed(2) + ' 籤';
+      renderBiao();
+    }
+
+    function setLotStep(step) {
+      lotStep = step;
+      document.getElementById('step001').classList.toggle('active', step === 0.01);
+      document.getElementById('step002').classList.toggle('active', step === 0.02);
+      document.getElementById('step003').classList.toggle('active', step === 0.03);
+      document.getElementById('step005').classList.toggle('active', step === 0.05);
+      renderBiao();
+    }
+
+    function setLotCount(cnt) {
+      lotCount = cnt;
+      document.getElementById('cnt5').classList.toggle('active', cnt === 5);
+      document.getElementById('cnt6').classList.toggle('active', cnt === 6);
+      document.getElementById('cnt9').classList.toggle('active', cnt === 9);
+      document.getElementById('cnt12').classList.toggle('active', cnt === 12);
+      renderBiao();
+    }
+
+    function selectYi(rate) {
+      selectedYiRate = rate;
+      document.getElementById('quickInspectSlider').value = rate.toFixed(2);
+      renderBiao();
+    }
+
+    function updateQuickInspect() {
+      const qRate = parseFloat(document.getElementById('quickInspectSlider').value);
+      selectedYiRate = qRate;
+      document.getElementById('quickRateTxt').innerText = qRate.toFixed(2) + ' 籤';
+      document.getElementById('quickScoreTxt').innerText = applyRound(jiaScore * qRate) + ' 分';
+      renderBiao();
+    }
+
+    function setBingMode(mode) {
+      bingMode = mode;
+      document.getElementById('bModeMinus').classList.toggle('active', mode === 'minus');
+      document.getElementById('bModeLot').classList.toggle('active', mode === 'lot');
+      renderBiao();
+    }
+
+    function renderBiao() {
+      // 產生動態乙標籤池 (由最高籤往下遞減，不低於 0.40)
+      const rates = [];
+      for (let i = 0; i < lotCount; i++) {
+        const r = Math.round((startRate - i * lotStep) * 100) / 100;
+        if (r >= 0.40) rates.push(r);
+      }
+
+      // 若目前選中的乙標籤不在清單內，預設對齊清單中間那支籤
+      if (!rates.some(r => Math.abs(r - selectedYiRate) < 0.001) && rates.length > 0) {
+        // 保留使用者剛才用放大鏡選的，或初始化
+      }
+
+      const maxScore = applyRound(jiaScore * rates[0]);
+      const minScore = applyRound(jiaScore * rates[rates.length - 1]);
+      document.getElementById('poolRangeSummary').innerText = `本筒範圍: ${minScore} ~ ${maxScore} 分`;
+
+      let yiHtml = '';
+      rates.forEach(r => {
+        const exact = jiaScore * r;
+        const score = applyRound(exact);
+        const isSel = Math.abs(r - selectedYiRate) < 0.001;
+        yiHtml += `
+          <div class="lot-card ${isSel ? 'selected' : ''}" onclick="selectYi(${r})">
+            <div class="lot-rate">${r.toFixed(2)} 籤</div>
+            <div class="lot-score">${score}</div>
+            <div class="lot-exact">${exact.toFixed(1)}</div>
+          </div>
+        `;
+      });
+      document.getElementById('yiGrid').innerHTML = yiHtml;
+
+      // 更新單籤快查條文字
+      const qRate = parseFloat(document.getElementById('quickInspectSlider').value);
+      document.getElementById('quickRateTxt').innerText = qRate.toFixed(2) + ' 籤';
+      document.getElementById('quickScoreTxt').innerText = applyRound(jiaScore * qRate) + ' 分';
+
+      // 渲染丙標
+      const baseYiScore = applyRound(jiaScore * selectedYiRate);
+      let bingHtml = '';
+
+      if (bingMode === 'minus') {
+        document.getElementById('bingBaseHint').innerText = `基準: 乙標 ${selectedYiRate.toFixed(2)} (${baseYiScore}分)`;
+        [10, 15, 20, 25, 30, 35].forEach(diff => {
+          bingHtml += `
+            <div class="bing-card">
+              <div class="bing-title">乙標 - ${diff}</div>
+              <div class="bing-val">${Math.max(0, baseYiScore - diff)}</div>
+              <div class="lot-exact">基數 ${baseYiScore}</div>
+            </div>
+          `;
+        });
+      } else {
+        document.getElementById('bingBaseHint').innerText = `基準: 比乙標(${selectedYiRate.toFixed(2)})再低之籤`;
+        [0.06, 0.08, 0.10, 0.12, 0.14, 0.16].forEach(drop => {
+          const bRate = Math.max(0.40, Math.round((selectedYiRate - drop) * 100) / 100);
+          const exact = jiaScore * bRate;
+          bingHtml += `
+            <div class="bing-card">
+              <div class="bing-title">${bRate.toFixed(2)} 籤</div>
+              <div class="bing-val">${applyRound(exact)}</div>
+              <div class="lot-exact">${exact.toFixed(1)}</div>
+            </div>
+          `;
+        });
+      }
+      document.getElementById('bingGrid').innerHTML = bingHtml;
+    }
+
+    // 啟動初始化
+    renderAim();
+    renderBiao();
   </script>
 </body>
 </html>
