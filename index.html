@@ -30,6 +30,14 @@
       --gap-m: 10px;
     }
 
+    /* 自適應高度變數：JS 會在執行時覆寫成實際像素值 */
+    :root {
+      --app-h: 100vh;
+    }
+    @supports (height: 100dvh) {
+      :root { --app-h: 100dvh; }
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -40,12 +48,16 @@
     }
 
     html, body {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
-      height: 100%;
+      height: var(--app-h);
       background-color: var(--bg-deep);
       color: var(--text-main);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
       overflow: hidden;
+      overscroll-behavior: none;
     }
 
     .app-shell {
@@ -53,7 +65,7 @@
       flex-direction: column;
       width: 100%;
       max-width: 460px;
-      height: 100%;
+      height: var(--app-h);
       margin: 0 auto;
       padding-top: max(env(safe-area-inset-top), 8px);
       position: relative;
@@ -1157,6 +1169,45 @@
   </div>
 
   <script>
+    /* ================= 自適應螢幕高度（修正 iOS 主畫面捷徑底部空白） ================= */
+    function fitAppHeight() {
+      const isStandalone =
+        window.navigator.standalone === true ||
+        (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+
+      let h = window.innerHeight;
+
+      if (isStandalone) {
+        // 主畫面模式：以實體螢幕尺寸為準，避免冷啟動時 iOS 少算高度
+        const longSide  = Math.max(screen.width, screen.height);
+        const isLandscape = window.innerWidth > window.innerHeight;
+        const shortSide = Math.min(screen.width, screen.height);
+        h = Math.max(h, isLandscape ? shortSide : longSide);
+      }
+
+      document.documentElement.style.setProperty('--app-h', h + 'px');
+    }
+
+    function fitAndRedraw() {
+      fitAppHeight();
+      renderAim();
+    }
+
+    // 立即執行一次
+    fitAppHeight();
+
+    // 各種可能改變視窗尺寸的時機都重新校正
+    window.addEventListener('load', fitAppHeight);
+    window.addEventListener('pageshow', fitAppHeight);
+    window.addEventListener('orientationchange', () => setTimeout(fitAndRedraw, 150));
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) fitAppHeight();
+    });
+
+    // iOS 冷啟動時視窗尺寸會稍後才穩定，延遲再補校正幾次
+    [100, 300, 800].forEach(ms => setTimeout(fitAppHeight, ms));
+
+    /* ================= 以下為原本程式碼 ================= */
     const SPECIAL_852_RATES = [0.88, 0.85, 0.82, 0.78, 0.75, 0.72, 0.68, 0.65, 0.62, 0.58, 0.55, 0.52];
     const LOT_COUNT_OPTIONS = [3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25];
 
@@ -2065,7 +2116,7 @@
     renderBiao();
     renderTotal();
 
-    window.addEventListener('resize', renderAim);
+    window.addEventListener('resize', fitAndRedraw);
   </script>
 </body>
 </html>
