@@ -16,15 +16,18 @@
   <style>
     :root {
       --bg-deep: #090d16;
-      --bg-card: rgba(20, 28, 46, 0.9);
+      --bg-card: rgba(20, 28, 46, 0.88);
       --border-glass: rgba(255, 255, 255, 0.09);
       --primary: #38bdf8;
       --gold: #fbbf24;
       --purple: #c084fc;
       --emerald: #10b981;
+      --rose: #fb7185;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --text-dim: #64748b;
+      --gap-s: 6px;
+      --gap-m: 10px;
     }
 
     * {
@@ -36,7 +39,6 @@
       -webkit-user-select: none;
     }
 
-    /* 安全的滿版配置：使用彈性 flex-col 搭配安全邊界 */
     html, body {
       width: 100%;
       height: 100%;
@@ -50,19 +52,21 @@
       display: flex;
       flex-direction: column;
       width: 100%;
-      max-width: 440px;
+      max-width: 460px;
       height: 100%;
       margin: 0 auto;
       padding-top: max(env(safe-area-inset-top), 8px);
+      position: relative;
     }
 
-    /* 內容視窗：分頁切換 */
+    /* 內容視窗：增加底部 padding 確保完整滾動且不被導航列遮擋 */
     .tab-view {
       display: none;
-      flex: 1;
+      flex: 1 1 0%;
       width: 100%;
       overflow-y: auto;
-      padding: 4px 10px 10px;
+      -webkit-overflow-scrolling: touch;
+      padding: 4px 10px calc(72px + env(safe-area-inset-bottom, 12px));
       scrollbar-width: none;
     }
     .tab-view::-webkit-scrollbar { display: none; }
@@ -70,23 +74,28 @@
     .tab-view.active {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: var(--gap-m);
     }
 
-    /* 瞄準器頁面不滾動，元件緊湊塞滿 */
+    /* 瞄準器維持一頁式不滾動 */
     #tabAim.active {
       overflow: hidden;
-      gap: 6px;
-      padding-bottom: 4px;
+      gap: var(--gap-s);
+      padding: 2px 10px 4px;
+      padding-bottom: calc(56px + env(safe-area-inset-bottom, 12px));
     }
 
-    /* 底部三分頁導航列 */
+    /* 底部導航列固定於最下層 */
     .bottom-nav {
-      flex-shrink: 0;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
       height: calc(52px + env(safe-area-inset-bottom, 12px));
       padding-bottom: env(safe-area-inset-bottom, 12px);
       background: rgba(11, 16, 28, 0.96);
       backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-top: 1px solid var(--border-glass);
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -154,7 +163,7 @@
     .pill-btn.active-gold { background: rgba(251, 191, 36, 0.22); color: var(--gold); border: 1px solid rgba(251, 191, 36, 0.4); }
     .pill-btn.active-emerald { background: rgba(16, 185, 129, 0.22); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.4); }
 
-    /* ================= 分頁 1：瞄準器 ================= */
+    /* ================= 瞄準器樣式 ================= */
     .aim-result-card {
       background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       border: 1px solid var(--border-glass);
@@ -237,7 +246,6 @@
     input[type=range].gold-slider::-webkit-slider-thumb { border-color: var(--gold); }
     input[type=range].emerald-slider::-webkit-slider-thumb { border-color: var(--emerald); }
 
-    /* 球道卡片：彈性吃滿剩餘高度 */
     .lane-card {
       background: var(--bg-card);
       border-radius: 12px;
@@ -245,8 +253,8 @@
       display: flex;
       flex-direction: column;
       border: 1px solid var(--border-glass);
-      flex: 1;
-      min-height: 140px;
+      flex: 1 1 0%;
+      min-height: 0;
       overflow: hidden;
     }
 
@@ -261,9 +269,10 @@
     }
 
     .svg-box {
-      flex: 1;
+      flex: 1 1 0%;
       width: 100%;
       height: 100%;
+      min-height: 0;
       background: #070a12;
       border-radius: 8px;
       display: flex;
@@ -274,11 +283,11 @@
 
     #laneSvg {
       height: 100%;
+      width: 100%;
       display: block;
-      transition: width 0.22s ease;
     }
 
-    /* ================= 標會通用樣式 ================= */
+    /* ================= 標會卡片樣式 ================= */
     .hero-card {
       background: linear-gradient(145deg, rgba(30, 41, 59, 0.92) 0%, rgba(15, 23, 42, 0.96) 100%);
       border: 1px solid rgba(251, 191, 36, 0.35);
@@ -468,9 +477,6 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 5px;
-      max-height: 210px;
-      overflow-y: auto;
-      padding-right: 1px;
     }
 
     .lot-card {
@@ -578,7 +584,7 @@
       background: rgba(13, 19, 33, 0.88);
       border: 1px solid rgba(192, 132, 252, 0.2);
       border-radius: 9px;
-      padding: 5px 4px;
+      padding: 6px 4px;
       text-align: center;
       cursor: pointer;
     }
@@ -759,7 +765,7 @@
           <span id="laneRightLabel">右1 ▶</span>
         </div>
         <div class="svg-box">
-          <svg id="laneSvg" viewBox="0 0 260 660" preserveAspectRatio="none" style="width: 100%;"></svg>
+          <svg id="laneSvg" viewBox="0 0 260 660" preserveAspectRatio="none"></svg>
         </div>
       </div>
     </div>
@@ -775,6 +781,7 @@
         </div>
       </div>
 
+      <!-- 單局甲標 -->
       <div class="hero-card">
         <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--gold); font-weight:700;">
           <span>👑 單局甲標 (最高分)</span>
@@ -799,6 +806,7 @@
         </div>
       </div>
 
+      <!-- 單局乙標籤筒設定 -->
       <div class="generator-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span style="font-size:0.76rem; font-weight:800; color:var(--primary);">🎯 單局乙標籤筒設定</span>
@@ -870,6 +878,7 @@
         </div>
       </div>
 
+      <!-- 單局丙標：全自訂輸入 + 快速點選 + 3模式切換 -->
       <div class="generator-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span style="font-size:0.76rem; font-weight:800; color:var(--purple);">⚡ 單局丙標自訂與快選</span>
@@ -1104,6 +1113,7 @@
         <div class="bing-grid" id="totalBingGrid"></div>
       </div>
 
+      <!-- 甲1~8 / 乙1~8 / 丙1~8 排名落點預估階梯表 -->
       <div class="generator-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span style="font-size:0.76rem; font-weight:800; color:var(--gold);">🏅 甲/乙/丙 1~8 名落點與尾局所需分</span>
@@ -2049,6 +2059,7 @@
       document.getElementById('rankLadderBody').innerHTML = tableHtml;
     }
 
+    // 啟動初始化
     setRoundMode('floor');
     renderAim();
     renderBiao();
