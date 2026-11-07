@@ -59,7 +59,6 @@
       position: relative;
     }
 
-    /* 內容視窗：增加底部 padding 確保完整滾動且不被導航列遮擋 */
     .tab-view {
       display: none;
       flex: 1 1 0%;
@@ -77,7 +76,6 @@
       gap: var(--gap-m);
     }
 
-    /* 瞄準器維持一頁式不滾動 */
     #tabAim.active {
       overflow: hidden;
       gap: var(--gap-s);
@@ -85,7 +83,6 @@
       padding-bottom: calc(56px + env(safe-area-inset-bottom, 12px));
     }
 
-    /* 底部導航列固定於最下層 */
     .bottom-nav {
       position: absolute;
       bottom: 0;
@@ -126,7 +123,6 @@
     .nav-item.active-biao { color: var(--gold); }
     .nav-item.active-total { color: var(--emerald); }
 
-    /* ================= 頂部列與膠囊按鈕 ================= */
     .top-bar {
       display: flex;
       justify-content: space-between;
@@ -163,7 +159,7 @@
     .pill-btn.active-gold { background: rgba(251, 191, 36, 0.22); color: var(--gold); border: 1px solid rgba(251, 191, 36, 0.4); }
     .pill-btn.active-emerald { background: rgba(16, 185, 129, 0.22); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.4); }
 
-    /* ================= 瞄準器樣式 ================= */
+    /* 瞄準器 */
     .aim-result-card {
       background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       border: 1px solid var(--border-glass);
@@ -287,7 +283,7 @@
       display: block;
     }
 
-    /* ================= 標會卡片樣式 ================= */
+    /* 標會卡片 */
     .hero-card {
       background: linear-gradient(145deg, rgba(30, 41, 59, 0.92) 0%, rgba(15, 23, 42, 0.96) 100%);
       border: 1px solid rgba(251, 191, 36, 0.35);
@@ -432,10 +428,16 @@
       color: #090d16;
     }
 
-    .seg-btn.active-special {
+    .seg-btn.active-dongxing {
       background: linear-gradient(135deg, #f59e0b, #ef4444);
       color: #ffffff;
       box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+    }
+
+    .seg-btn.active-highrpm {
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
     }
 
     .special-banner {
@@ -448,6 +450,12 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+
+    .special-banner.highrpm-banner {
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px dashed rgba(6, 182, 212, 0.45);
+      color: #38bdf8;
     }
 
     .inline-num-box {
@@ -811,13 +819,14 @@
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span style="font-size:0.76rem; font-weight:800; color:var(--primary);">🎯 單局乙標籤筒設定</span>
           <div class="seg-group">
-            <button class="seg-btn" id="poolModeCustom" onclick="setPoolMode('custom')">自訂等距</button>
-            <button class="seg-btn active-special" id="poolModeSpecial" onclick="setPoolMode('special852')">🔥 專屬賽事 (88~52)</button>
+            <button class="seg-btn" id="poolModeCustom" onclick="setPoolMode('custom')">自訂</button>
+            <button class="seg-btn" id="poolModeDongxing" onclick="setPoolMode('dongxing')">🏆 東興</button>
+            <button class="seg-btn active-highrpm" id="poolModeHighRpm" onclick="setPoolMode('highrpm')">⚡ 高轉速</button>
           </div>
         </div>
 
-        <div id="specialPoolBanner" class="special-banner">
-          <span>✨ 專屬 12 支籤 (8·5·2循環 / 無條件捨去)</span>
+        <div id="specialPoolBanner" class="special-banner highrpm-banner">
+          <span id="bannerDescText">✨ 高轉速 18 支專屬籤 (無條件捨去)</span>
           <strong id="poolRangeSummary">132~224分</strong>
         </div>
 
@@ -863,7 +872,7 @@
         <div class="inspector-box">
           <div class="inspector-top">
             <span style="color:var(--text-muted);">
-              🔍 乙標單支快查 <span class="step-badge" id="quickStepBadge">專屬 8·5·2 跳籤</span>
+              🔍 乙標單支快查 <span class="step-badge" id="quickStepBadge">⚡ 高轉速 18 籤</span>
             </span>
             <span>
               <strong style="color:var(--gold);" id="quickRateTxt">0.88 籤</strong> ➔ 
@@ -878,7 +887,7 @@
         </div>
       </div>
 
-      <!-- 單局丙標：全自訂輸入 + 快速點選 + 3模式切換 -->
+      <!-- 單局丙標 -->
       <div class="generator-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span style="font-size:0.76rem; font-weight:800; color:var(--purple);">⚡ 單局丙標自訂與快選</span>
@@ -1006,17 +1015,19 @@
         </div>
       </div>
 
+      <!-- 總分乙1 籤筒產生器 -->
       <div class="generator-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span style="font-size:0.76rem; font-weight:800; color:var(--primary);">🎯 預估【總分乙1】籤筒設定</span>
           <div class="seg-group">
-            <button class="seg-btn" id="tPoolModeCustom" onclick="setTPoolMode('custom')">自訂等距</button>
-            <button class="seg-btn active-special" id="tPoolModeSpecial" onclick="setTPoolMode('special852')">🔥 專屬賽事 (88~52)</button>
+            <button class="seg-btn" id="tPoolModeCustom" onclick="setTPoolMode('custom')">自訂</button>
+            <button class="seg-btn" id="tPoolModeDongxing" onclick="setTPoolMode('dongxing')">🏆 東興</button>
+            <button class="seg-btn active-highrpm" id="tPoolModeHighRpm" onclick="setTPoolMode('highrpm')">⚡ 高轉速</button>
           </div>
         </div>
 
-        <div id="tSpecialPoolBanner" class="special-banner">
-          <span>✨ 總分套用專屬 12 支籤 (0.88 ~ 0.52)</span>
+        <div id="tSpecialPoolBanner" class="special-banner highrpm-banner">
+          <span id="tBannerDescText">✨ 高轉速 18 支專屬籤 (0.88 ~ 0.52)</span>
           <strong id="totalYiSummary">585~990分</strong>
         </div>
 
@@ -1059,7 +1070,7 @@
         <div class="inspector-box">
           <div class="inspector-top">
             <span style="color:var(--text-muted);">
-              🔍 乙1單籤快查 <span class="step-badge" id="tQuickStepBadge">專屬 8·5·2 跳籤</span>
+              🔍 乙1單籤快查 <span class="step-badge" id="tQuickStepBadge">⚡ 高轉速 18 籤</span>
             </span>
             <span>
               <strong style="color:var(--gold);" id="tQuickRateTxt">0.88 籤</strong> ➔ 
@@ -1074,6 +1085,7 @@
         </div>
       </div>
 
+      <!-- 總分丙1 -->
       <div class="generator-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span style="font-size:0.76rem; font-weight:800; color:var(--purple);">⚡ 預估【總分丙1】自訂與快選</span>
@@ -1113,7 +1125,7 @@
         <div class="bing-grid" id="totalBingGrid"></div>
       </div>
 
-      <!-- 甲1~8 / 乙1~8 / 丙1~8 排名落點預估階梯表 -->
+      <!-- 排名落點預估階梯表 -->
       <div class="generator-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span style="font-size:0.76rem; font-weight:800; color:var(--gold);">🏅 甲/乙/丙 1~8 名落點與尾局所需分</span>
@@ -1157,7 +1169,15 @@
   </div>
 
   <script>
-    const SPECIAL_852_RATES = [0.88, 0.85, 0.82, 0.78, 0.75, 0.72, 0.68, 0.65, 0.62, 0.58, 0.55, 0.52];
+    // 東興 12 支固定籤池 (8, 5, 2 循環)
+    const DONGXING_RATES = [0.88, 0.85, 0.82, 0.78, 0.75, 0.72, 0.68, 0.65, 0.62, 0.58, 0.55, 0.52];
+
+    // 高轉速 18 支專屬籤池 (由大到小排序)
+    const HIGHRPM_RATES = [
+      0.88, 0.85, 0.83, 0.82, 0.80, 0.78, 0.75, 0.73, 0.72,
+      0.70, 0.68, 0.65, 0.63, 0.62, 0.60, 0.58, 0.55, 0.52
+    ];
+
     const LOT_COUNT_OPTIONS = [3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25];
 
     function switchTab(tab) {
@@ -1195,7 +1215,7 @@
       return snapped;
     }
 
-    /* ================= 分頁 1 邏輯 ================= */
+    /* ================= 分頁 1 瞄準器邏輯 ================= */
     let currentHand = 'R';
     let stanceBoard = 25;
     let bpBoard = 8;
@@ -1354,10 +1374,10 @@
       svg.innerHTML = html;
     }
 
-    /* ================= 分頁 2 邏輯 ================= */
+    /* ================= 分頁 2 單局標會邏輯 ================= */
     let jiaScore = 255;
     let roundMode = 'floor';
-    let poolMode = 'special852';
+    let poolMode = 'highrpm'; // 預設開啟高轉速
     let startRate = 0.84;
     let lotStep = 0.02;
     let lotCount = 8;
@@ -1385,13 +1405,25 @@
 
     function setPoolMode(mode) {
       poolMode = mode;
-      const isSpec = (mode === 'special852');
-      document.getElementById('poolModeCustom').className = 'seg-btn ' + (!isSpec ? 'active' : '');
-      document.getElementById('poolModeSpecial').className = 'seg-btn ' + (isSpec ? 'active-special' : '');
-      document.getElementById('specialPoolBanner').style.display = isSpec ? 'flex' : 'none';
-      document.getElementById('customPoolControls').style.display = isSpec ? 'none' : 'flex';
+      document.getElementById('poolModeCustom').className = 'seg-btn ' + (mode === 'custom' ? 'active' : '');
+      document.getElementById('poolModeDongxing').className = 'seg-btn ' + (mode === 'dongxing' ? 'active-dongxing' : '');
+      document.getElementById('poolModeHighRpm').className = 'seg-btn ' + (mode === 'highrpm' ? 'active-highrpm' : '');
 
-      if (isSpec) {
+      const isCustom = (mode === 'custom');
+      document.getElementById('specialPoolBanner').style.display = isCustom ? 'none' : 'flex';
+      document.getElementById('customPoolControls').style.display = isCustom ? 'flex' : 'none';
+
+      const banner = document.getElementById('specialPoolBanner');
+      const descText = document.getElementById('bannerDescText');
+
+      if (mode === 'dongxing') {
+        banner.className = 'special-banner';
+        descText.innerText = '✨ 東興 12 支專屬籤 (8·5·2循環 / 無條件捨去)';
+        selectedYiRate = 0.88;
+        setRoundMode('floor');
+      } else if (mode === 'highrpm') {
+        banner.className = 'special-banner highrpm-banner';
+        descText.innerText = '✨ 高轉速 18 支專屬籤 (無條件捨去)';
         selectedYiRate = 0.88;
         setRoundMode('floor');
       } else {
@@ -1465,11 +1497,12 @@
     }
 
     function stepQuickInspect(dir) {
-      if (poolMode === 'special852') {
-        let idx = SPECIAL_852_RATES.findIndex(r => Math.abs(r - selectedYiRate) < 0.005);
+      let pool = (poolMode === 'dongxing') ? DONGXING_RATES : (poolMode === 'highrpm' ? HIGHRPM_RATES : null);
+      if (pool) {
+        let idx = pool.findIndex(r => Math.abs(r - selectedYiRate) < 0.005);
         if (idx === -1) idx = 0;
-        idx = Math.max(0, Math.min(SPECIAL_852_RATES.length - 1, idx - dir));
-        selectedYiRate = SPECIAL_852_RATES[idx];
+        idx = Math.max(0, Math.min(pool.length - 1, idx - dir));
+        selectedYiRate = pool[idx];
         document.getElementById('quickInspectSlider').value = selectedYiRate.toFixed(2);
         renderBiao();
         return;
@@ -1535,9 +1568,12 @@
       document.getElementById('lotCountChips').innerHTML = cntHtml;
 
       let rates = [];
-      if (poolMode === 'special852') {
-        rates = SPECIAL_852_RATES.slice();
-        document.getElementById('quickStepBadge').innerText = '專屬 8·5·2 跳籤';
+      if (poolMode === 'dongxing') {
+        rates = DONGXING_RATES.slice();
+        document.getElementById('quickStepBadge').innerText = '🏆 東興 12 籤';
+      } else if (poolMode === 'highrpm') {
+        rates = HIGHRPM_RATES.slice();
+        document.getElementById('quickStepBadge').innerText = '⚡ 高轉速 18 籤';
       } else {
         syncInspectorSlider('quickInspectSlider', 'quickStepBadge', startRate, lotStep, selectedYiRate);
         for (let i = 0; i < lotCount; i++) {
@@ -1592,7 +1628,7 @@
         heroBingScore = applyRound(exact);
         document.getElementById('bingFormulaDetail').innerText = `乙標 ${baseYiScore} × ${singleBingYiMultVal.toFixed(2)} (${exact.toFixed(1)}) =`;
 
-        quickPresets = (poolMode === 'special852') ? [0.88, 0.85, 0.82, 0.78, 0.75, 0.72] : [0.95, 0.92, 0.90, 0.88, 0.85, 0.82, 0.80, 0.78, 0.75];
+        quickPresets = [0.92, 0.90, 0.88, 0.85, 0.82, 0.80, 0.78, 0.75, 0.72];
         [0.88, 0.85, 0.82, 0.78, 0.75, 0.72].forEach(m => {
           const ex = baseYiScore * m;
           gridCards.push({ val: m, title: `乙標 × ${m.toFixed(2)}`, score: applyRound(ex), sub: `實算 ${ex.toFixed(1)}`, active: Math.abs(m - singleBingYiMultVal) < 0.005 });
@@ -1604,8 +1640,18 @@
         heroBingScore = applyRound(exact);
         document.getElementById('bingFormulaDetail').innerText = `甲標 ${jiaScore} × ${singleBingJiaMultVal.toFixed(2)} (${exact.toFixed(1)}) =`;
 
-        quickPresets = (poolMode === 'special852') ? SPECIAL_852_RATES.slice(3, 12) : [0.78, 0.76, 0.75, 0.74, 0.72, 0.70, 0.68, 0.66, 0.65, 0.60];
-        const sampleRates = (poolMode === 'special852') ? [0.78, 0.75, 0.72, 0.68, 0.65, 0.62] : [1, 2, 3, 4, 5, 6].map(m => Math.max(0.35, Math.round((selectedYiRate - m * lotStep) * 100) / 100));
+        let sampleRates = [];
+        if (poolMode === 'dongxing') {
+          quickPresets = DONGXING_RATES.slice(3, 12);
+          sampleRates = [0.78, 0.75, 0.72, 0.68, 0.65, 0.62];
+        } else if (poolMode === 'highrpm') {
+          quickPresets = HIGHRPM_RATES.slice(5, 15);
+          sampleRates = [0.78, 0.75, 0.72, 0.70, 0.68, 0.65];
+        } else {
+          quickPresets = [0.78, 0.76, 0.75, 0.74, 0.72, 0.70, 0.68, 0.66, 0.65, 0.60];
+          sampleRates = [1, 2, 3, 4, 5, 6].map(m => Math.max(0.35, Math.round((selectedYiRate - m * lotStep) * 100) / 100));
+        }
+
         sampleRates.forEach(br => {
           const ex = jiaScore * br;
           gridCards.push({ val: br, title: `甲標 × ${br.toFixed(2)}`, score: applyRound(ex), sub: `實算 ${ex.toFixed(1)}`, active: Math.abs(br - singleBingJiaMultVal) < 0.005 });
@@ -1636,7 +1682,7 @@
       document.getElementById('bingGrid').innerHTML = bingHtml;
     }
 
-    /* ================= 分頁 3 邏輯 ================= */
+    /* ================= 分頁 3 總分尾局預估邏輯 ================= */
     let totalGames = 5;
     let estMode = 'pre';
     let leaderPrevSum = 900;
@@ -1644,7 +1690,7 @@
     let directTotalJia = 1125;
     let myPrevSum = 700;
 
-    let tPoolMode = 'special852';
+    let tPoolMode = 'highrpm'; // 總分也預設開啟高轉速
     let tStartRate = 0.84;
     let tLotStep = 0.02;
     let tLotCount = 8;
@@ -1658,13 +1704,25 @@
 
     function setTPoolMode(mode) {
       tPoolMode = mode;
-      const isSpec = (mode === 'special852');
-      document.getElementById('tPoolModeCustom').className = 'seg-btn ' + (!isSpec ? 'active' : '');
-      document.getElementById('tPoolModeSpecial').className = 'seg-btn ' + (isSpec ? 'active-special' : '');
-      document.getElementById('tSpecialPoolBanner').style.display = isSpec ? 'flex' : 'none';
-      document.getElementById('tCustomPoolControls').style.display = isSpec ? 'none' : 'flex';
+      document.getElementById('tPoolModeCustom').className = 'seg-btn ' + (mode === 'custom' ? 'active' : '');
+      document.getElementById('tPoolModeDongxing').className = 'seg-btn ' + (mode === 'dongxing' ? 'active-dongxing' : '');
+      document.getElementById('tPoolModeHighRpm').className = 'seg-btn ' + (mode === 'highrpm' ? 'active-highrpm' : '');
 
-      if (isSpec) {
+      const isCustom = (mode === 'custom');
+      document.getElementById('tSpecialPoolBanner').style.display = isCustom ? 'none' : 'flex';
+      document.getElementById('tCustomPoolControls').style.display = isCustom ? 'flex' : 'none';
+
+      const banner = document.getElementById('tSpecialPoolBanner');
+      const descText = document.getElementById('tBannerDescText');
+
+      if (mode === 'dongxing') {
+        banner.className = 'special-banner';
+        descText.innerText = '✨ 東興 12 支專屬籤 (0.88 ~ 0.52)';
+        tSelectedYiRate = 0.88;
+        setRoundMode('floor');
+      } else if (mode === 'highrpm') {
+        banner.className = 'special-banner highrpm-banner';
+        descText.innerText = '✨ 高轉速 18 支專屬籤 (0.88 ~ 0.52)';
         tSelectedYiRate = 0.88;
         setRoundMode('floor');
       } else {
@@ -1828,11 +1886,12 @@
     }
 
     function stepTQuickInspect(dir) {
-      if (tPoolMode === 'special852') {
-        let idx = SPECIAL_852_RATES.findIndex(r => Math.abs(r - tSelectedYiRate) < 0.005);
+      let pool = (tPoolMode === 'dongxing') ? DONGXING_RATES : (tPoolMode === 'highrpm' ? HIGHRPM_RATES : null);
+      if (pool) {
+        let idx = pool.findIndex(r => Math.abs(r - tSelectedYiRate) < 0.005);
         if (idx === -1) idx = 0;
-        idx = Math.max(0, Math.min(SPECIAL_852_RATES.length - 1, idx - dir));
-        tSelectedYiRate = SPECIAL_852_RATES[idx];
+        idx = Math.max(0, Math.min(pool.length - 1, idx - dir));
+        tSelectedYiRate = pool[idx];
         document.getElementById('tQuickSlider').value = tSelectedYiRate.toFixed(2);
         renderTotal();
         return;
@@ -1924,9 +1983,12 @@
       document.getElementById('tLotCountChips').innerHTML = tCntHtml;
 
       let rates = [];
-      if (tPoolMode === 'special852') {
-        rates = SPECIAL_852_RATES.slice();
-        document.getElementById('tQuickStepBadge').innerText = '專屬 8·5·2 跳籤';
+      if (tPoolMode === 'dongxing') {
+        rates = DONGXING_RATES.slice();
+        document.getElementById('tQuickStepBadge').innerText = '🏆 東興 12 籤';
+      } else if (tPoolMode === 'highrpm') {
+        rates = HIGHRPM_RATES.slice();
+        document.getElementById('tQuickStepBadge').innerText = '⚡ 高轉速 18 籤';
       } else {
         syncInspectorSlider('tQuickSlider', 'tQuickStepBadge', tStartRate, tLotStep, tSelectedYiRate);
         for (let i = 0; i < tLotCount; i++) {
@@ -1970,7 +2032,7 @@
         bing1Score = applyRound(exact);
         document.getElementById('tBingFormulaDetail').innerText = `乙1(${yi1Score}) × ${tBingMultVal.toFixed(2)} =`;
 
-        tQuickPresets = (tPoolMode === 'special852') ? [0.88, 0.85, 0.82, 0.78, 0.75, 0.72] : [0.95, 0.92, 0.90, 0.88, 0.86, 0.85, 0.82, 0.80, 0.78, 0.75];
+        tQuickPresets = [0.92, 0.90, 0.88, 0.85, 0.82, 0.80, 0.78, 0.75, 0.72];
         [0.88, 0.85, 0.82, 0.78, 0.75, 0.72].forEach(m => {
           const sc = applyRound(yi1Score * m);
           tGridCards.push({ val: m, label: `乙1 × ${m.toFixed(2)}`, score: sc, active: Math.abs(m - tBingMultVal) < 0.005 });
@@ -1993,8 +2055,18 @@
         bing1Score = applyRound(exact);
         document.getElementById('tBingFormulaDetail').innerText = `甲1(${projJia}) × ${tBingJiaLotVal.toFixed(2)} =`;
 
-        tQuickPresets = (tPoolMode === 'special852') ? SPECIAL_852_RATES.slice(3, 12) : [0.78, 0.76, 0.75, 0.74, 0.72, 0.70, 0.68, 0.66, 0.65, 0.60];
-        const sampleRates = (tPoolMode === 'special852') ? [0.78, 0.75, 0.72, 0.68, 0.65, 0.62] : [1, 2, 3, 4, 5, 6].map(m => Math.max(0.35, Math.round((tSelectedYiRate - m * tLotStep) * 100) / 100));
+        let sampleRates = [];
+        if (tPoolMode === 'dongxing') {
+          tQuickPresets = DONGXING_RATES.slice(3, 12);
+          sampleRates = [0.78, 0.75, 0.72, 0.68, 0.65, 0.62];
+        } else if (tPoolMode === 'highrpm') {
+          tQuickPresets = HIGHRPM_RATES.slice(5, 15);
+          sampleRates = [0.78, 0.75, 0.72, 0.70, 0.68, 0.65];
+        } else {
+          tQuickPresets = [0.78, 0.76, 0.75, 0.74, 0.72, 0.70, 0.68, 0.66, 0.65, 0.60];
+          sampleRates = [1, 2, 3, 4, 5, 6].map(m => Math.max(0.35, Math.round((tSelectedYiRate - m * tLotStep) * 100) / 100));
+        }
+
         sampleRates.forEach(br => {
           const sc = applyRound(projJia * br);
           tGridCards.push({ val: br, label: `甲1 × ${br.toFixed(2)}`, score: sc, active: Math.abs(br - tBingJiaLotVal) < 0.005 });
@@ -2059,7 +2131,6 @@
       document.getElementById('rankLadderBody').innerHTML = tableHtml;
     }
 
-    // 啟動初始化
     setRoundMode('floor');
     renderAim();
     renderBiao();
